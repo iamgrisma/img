@@ -11,3 +11,4 @@ if (fs.existsSync(indexJs)) {
   fs.renameSync(indexJs, workerJs);
   console.log('Successfully generated public/_worker.js');
 }
+

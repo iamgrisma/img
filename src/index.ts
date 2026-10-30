@@ -27,7 +27,20 @@ app.all('*', async (c) => {
   const cleanPath = url.pathname.replace(/^\/+|\/+$/g, '');
 
   if (cleanPath === 'favicon.ico') return c.body(null, 204);
-  if (!cleanPath || cleanPath === 'api' || cleanPath === 'health') {
+  if (!cleanPath) {
+    if ((c.env as any)?.ASSETS) {
+      return (c.env as any).ASSETS.fetch(c.req.raw);
+    }
+    return c.json(
+      { status: 'ok', service: 'imagengine' },
+      200,
+      {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
+      }
+    );
+  }
+  if (cleanPath === 'api' || cleanPath === 'health') {
     return c.json(
       { status: 'ok', service: 'imagengine' },
       200,
