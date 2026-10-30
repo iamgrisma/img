@@ -1877,7 +1877,7 @@ var MIME = {
 };
 var CACHE_HEADER = "public, max-age=31536000, s-maxage=31536000, immutable";
 var CDN_CACHE_HEADER = "public, max-age=31536000, immutable";
-var SVG_MAX_SIZE = 2e6;
+var SVG_MAX_SIZE = 6e6;
 var RASTER_MAX_SIZE = 25e6;
 var FETCH_TIMEOUT_MS = 5e3;
 var DEFAULT_SVG_WIDTH = 1200;
@@ -4119,7 +4119,7 @@ var src_default = app;
 // [[path]].ts
 var onRequest = handle(src_default);
 
-// ../../.wrangler/tmp/pages-ZTUTNK/functionsRoutes-0.8874113666037513.mjs
+// ../../.wrangler/tmp/pages-rAWBaz/functionsRoutes-0.21933545123659337.mjs
 var routes = [
   {
     routePath: "/:path*",

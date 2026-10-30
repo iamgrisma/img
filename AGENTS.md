@@ -11,7 +11,7 @@ ImagEngine is a zero-latency, WebAssembly-powered image optimization and transfo
 ### Core File Structure
 
 - `src/constants.ts`
-  - Defines tenant mappings (`TENANTS`), engine reserved query parameter keys (`ENGINE_KEYS`), MIME types, cache header policies, and memory/dimension limits (`MAX_DIMENSION = 2560`, `MAX_UPSCALE_FACTOR = 4`, `RASTER_MAX_SIZE = 25_000_000`, `SVG_MAX_SIZE = 2_000_000`, `FETCH_TIMEOUT_MS = 5_000`).
+  - Defines tenant mappings (`TENANTS`), engine reserved query parameter keys (`ENGINE_KEYS`), MIME types, cache header policies, and memory/dimension limits (`MAX_DIMENSION = 2560`, `MAX_UPSCALE_FACTOR = 4`, `RASTER_MAX_SIZE = 25_000_000`, `SVG_MAX_SIZE = 6_000_000`, `FETCH_TIMEOUT_MS = 5_000`).
 - `src/routing.ts`
   - Handles URL route parsing and upstream origin resolution.
   - Supports dual route patterns: slug-based conversion (`path-origExt.targetExt`) and query parameter-based conversion (`path.origExt?format=targetExt`).
