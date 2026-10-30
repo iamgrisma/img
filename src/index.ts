@@ -17,13 +17,7 @@ app.use('*', async (c, next) => {
 
 app.all('*', async (c) => {
   const url = new URL(c.req.url);
-  // Auto-correct missing '&' in query parameters like ?h=630w=450 -> ?h=630&w=450
-  const normalizedSearch = url.search.replace(
-    /([0-9a-z])(w|width|h|height|q|quality|fit|position|format|cw|cropwidth|ch|cropheight|avatar)=/gi,
-    '$1&$2='
-  );
-  const searchParams = new URLSearchParams(normalizedSearch);
-  const query = Object.fromEntries(searchParams.entries());
+  const query = Object.fromEntries(url.searchParams.entries());
   const cleanPath = url.pathname.replace(/^\/+|\/+$/g, '');
 
   if (cleanPath === 'favicon.ico') return c.body(null, 204);

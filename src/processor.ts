@@ -62,67 +62,87 @@ async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8
   return resvg.render().asPng();
 }
 
-interface ResizePlan {
-  resizeW: number;
-  resizeH: number;
-  cropX: number;
-  cropY: number;
-  cropW: number;
-  cropH: number;
-  needsCrop: boolean;
-}
-
 function cropOffset(d: number, t: number, p: string): number {
   if (p === 'top' || p === 'left') return 0;
   if (p === 'bottom' || p === 'right') return Math.max(0, d - t);
   return Math.max(0, Math.floor((d - t) / 2));
 }
 
-function planResize(srcW: number, srcH: number, tw: number, th: number, fit: string, pos: string): ResizePlan {
-  const sr = srcW / srcH;
+function executeResize(
+  img: PhotonImage,
+  tw: number,
+  th: number,
+  fit: string,
+  pos: string,
+  toFree: PhotonImage[]
+): PhotonImage {
+  const sw = img.get_width();
+  const sh = img.get_height();
+  const sr = sw / sh;
   const tr = tw / th;
+
   if (fit === 'fill') {
-    return { resizeW: tw, resizeH: th, cropX: 0, cropY: 0, cropW: tw, cropH: th, needsCrop: false };
+    const old = img;
+    const res = resize(img, tw, th, SamplingFilter.Lanczos3);
+    toFree.push(old);
+    return res;
   }
-  if (fit === 'cover' || fit === 'outside') {
-    let rw: number;
-    let rh: number;
-    if (sr > tr) {
-      rh = th;
-      rw = Math.round(th * sr);
-    } else {
-      rw = tw;
-      rh = Math.round(tw / sr);
-    }
-    return {
-      resizeW: rw,
-      resizeH: rh,
-      cropX: cropOffset(rw, tw, pos),
-      cropY: cropOffset(rh, th, pos),
-      cropW: tw,
-      cropH: th,
-      needsCrop: rw > tw || rh > th,
-    };
-  }
+
   if (fit === 'contain') {
     let rw: number;
     let rh: number;
     if (sr > tr) {
       rw = tw;
-      rh = Math.round(tw / sr);
+      rh = Math.max(1, Math.round(tw / sr));
     } else {
       rh = th;
-      rw = Math.round(th * sr);
+      rw = Math.max(1, Math.round(th * sr));
     }
-    return { resizeW: rw, resizeH: rh, cropX: 0, cropY: 0, cropW: rw, cropH: rh, needsCrop: false };
+    const old = img;
+    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    toFree.push(old);
+    return res;
   }
+
   if (fit === 'inside') {
-    const s = Math.min(tw / srcW, th / srcH, 1);
-    const rw = Math.max(1, Math.round(srcW * s));
-    const rh = Math.max(1, Math.round(srcH * s));
-    return { resizeW: rw, resizeH: rh, cropX: 0, cropY: 0, cropW: rw, cropH: rh, needsCrop: false };
+    const s = Math.min(tw / sw, th / sh, 1);
+    const rw = Math.max(1, Math.round(sw * s));
+    const rh = Math.max(1, Math.round(sh * s));
+    const old = img;
+    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    toFree.push(old);
+    return res;
   }
-  return { resizeW: tw, resizeH: th, cropX: 0, cropY: 0, cropW: tw, cropH: th, needsCrop: false };
+
+  // Default: 'cover' (and 'outside')
+  // Crop on source FIRST to prevent gigantic upscaled intermediate buffers and CPU chokes
+  let cropW = sw;
+  let cropH = sh;
+  if (sr > tr) {
+    cropH = sh;
+    cropW = Math.max(1, Math.round(sh * tr));
+  } else {
+    cropW = sw;
+    cropH = Math.max(1, Math.round(sw / tr));
+  }
+
+  const cropX = cropOffset(sw, cropW, pos);
+  const cropY = cropOffset(sh, cropH, pos);
+
+  let current = img;
+  if (cropW < sw || cropH < sh) {
+    const old = current;
+    current = safeCrop(current, cropX, cropY, cropW, cropH);
+    toFree.push(old);
+  }
+
+  if (current.get_width() !== tw || current.get_height() !== th) {
+    const old = current;
+    current = resize(current, tw, th, SamplingFilter.Lanczos3);
+    toFree.push(old);
+  }
+
+  return current;
 }
 
 function safeCrop(img: PhotonImage, x: number, y: number, w: number, h: number): PhotonImage {
@@ -288,15 +308,7 @@ async function transformRaster(
   }
 
   if (opts.width && opts.height) {
-    const p = planResize(sw, sh, opts.width, opts.height, opts.fit, opts.position);
-    const old = image;
-    image = resize(image, p.resizeW, p.resizeH, SamplingFilter.Lanczos3);
-    toFree.push(old);
-    if (p.needsCrop) {
-      const o2 = image;
-      image = safeCrop(image, p.cropX, p.cropY, p.cropW, p.cropH);
-      toFree.push(o2);
-    }
+    image = executeResize(image, opts.width, opts.height, opts.fit, opts.position, toFree);
   } else if (opts.width || opts.height) {
     let rw: number;
     let rh: number;

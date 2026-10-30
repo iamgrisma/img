@@ -30,3 +30,4 @@ export const FETCH_TIMEOUT_MS = 5_000;
 export const DEFAULT_SVG_WIDTH = 1200;
 export const DEFAULT_QUALITY = 85;
 export const RESIZE_FILTER_LANCZOS3 = 5;
+export const MAX_DIMENSION = 2560;

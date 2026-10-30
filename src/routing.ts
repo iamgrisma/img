@@ -1,4 +1,4 @@
-import { TENANTS, ENGINE_KEYS, DEFAULT_QUALITY } from './constants';
+import { TENANTS, ENGINE_KEYS, DEFAULT_QUALITY, MAX_DIMENSION } from './constants';
 
 export function normalizeExt(ext = ''): string {
   return ext.toLowerCase().replace('jpeg', 'jpg');
@@ -87,12 +87,12 @@ export function getOptions(query: Record<string, string>, cleanPath: string): Tr
   const rawH = query.h || query.height;
   const hasExplicitW = Boolean(rawW);
   const hasExplicitH = Boolean(rawH);
-  let width = hasExplicitW ? parseInt(rawW!, 10) : null;
-  let height = hasExplicitH ? parseInt(rawH!, 10) : null;
+  let width = hasExplicitW ? Math.min(Math.max(parseInt(rawW!, 10), 1), MAX_DIMENSION) : null;
+  let height = hasExplicitH ? Math.min(Math.max(parseInt(rawH!, 10), 1), MAX_DIMENSION) : null;
   const rawCw = query.cw || query.cropWidth || query.cropwidth;
   const rawCh = query.ch || query.cropHeight || query.cropheight;
-  const cropWidth = rawCw ? parseInt(rawCw, 10) : null;
-  const cropHeight = rawCh ? parseInt(rawCh, 10) : null;
+  const cropWidth = rawCw ? Math.min(Math.max(parseInt(rawCw, 10), 1), MAX_DIMENSION) : null;
+  const cropHeight = rawCh ? Math.min(Math.max(parseInt(rawCh, 10), 1), MAX_DIMENSION) : null;
   const hasCrop = Boolean(cropWidth || cropHeight);
 
   if (!hasExplicitW && !hasExplicitH && !hasCrop) {
