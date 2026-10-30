@@ -43,6 +43,27 @@ app.all('*', async (c) => {
     return errorResponse(404, 'Route not found. Required: /[subdomain.]identifier/{path}-{origExt}.{targetExt}');
   }
 
+  // Check programmatic Cloudflare Edge Cache API
+  const cacheKey = new Request(url.toString(), { method: 'GET' });
+  let cache: Cache | null = null;
+  try {
+    cache = (caches as any).default;
+  } catch {}
+
+  if (cache) {
+    try {
+      const cachedResponse = await cache.match(cacheKey);
+      if (cachedResponse) {
+        const ifNoneMatch = c.req.header('If-None-Match');
+        const cachedEtag = cachedResponse.headers.get('ETag');
+        if (ifNoneMatch && cachedEtag && ifNoneMatch === cachedEtag) {
+          return notModifiedResponse(cachedEtag);
+        }
+        return cachedResponse;
+      }
+    } catch {}
+  }
+
   const { originUrl, originHost, withoutExt, origExt, requestedExt: routeExt } = route;
   const requestedExt = normalizeExt(query.format || routeExt || 'webp');
 
@@ -62,30 +83,43 @@ app.all('*', async (c) => {
   const webpSource = source.type.includes('webp');
   const ifNoneMatch = c.req.header('If-None-Match');
 
+  function sendImage(res: Response): Response {
+    if (cache && c.executionCtx) {
+      try {
+        c.executionCtx.waitUntil(cache.put(cacheKey, res.clone()));
+      } catch {}
+    }
+    return res;
+  }
+
   if (!transformed && source.svg && requestedExt === 'svg') {
     const body = new TextEncoder().encode(source.svg);
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);
-    return imageResponse(body, {
-      type: MIME.svg,
-      filename: `${basename(withoutExt)}.svg`,
-      host: originHost,
-      engine: 'edge-passthrough',
-      etag,
-    });
+    return sendImage(
+      imageResponse(body, {
+        type: MIME.svg,
+        filename: `${basename(withoutExt)}.svg`,
+        host: originHost,
+        engine: 'edge-passthrough',
+        etag,
+      })
+    );
   }
 
   if (!transformed && source.raster && (sameExt || (requestedExt === 'webp' && webpSource))) {
     const body = source.raster;
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);
-    return imageResponse(body, {
-      type: MIME[requestedExt] || source.type || 'application/octet-stream',
-      filename: `${basename(withoutExt)}.${requestedExt}`,
-      host: originHost,
-      engine: 'edge-passthrough',
-      etag,
-    });
+    return sendImage(
+      imageResponse(body, {
+        type: MIME[requestedExt] || source.type || 'application/octet-stream',
+        filename: `${basename(withoutExt)}.${requestedExt}`,
+        host: originHost,
+        engine: 'edge-passthrough',
+        etag,
+      })
+    );
   }
 
   try {
@@ -98,14 +132,16 @@ app.all('*', async (c) => {
       extraHeaders['X-Format-Fallback'] = `${requestedExt}→${result.actualExt}`;
     }
 
-    return imageResponse(result.buffer, {
-      type: result.type,
-      filename: `${basename(withoutExt) || 'asset'}.${result.actualExt}`,
-      host: originHost,
-      engine: result.engine,
-      etag,
-      extraHeaders,
-    });
+    return sendImage(
+      imageResponse(result.buffer, {
+        type: result.type,
+        filename: `${basename(withoutExt) || 'asset'}.${result.actualExt}`,
+        host: originHost,
+        engine: result.engine,
+        etag,
+        extraHeaders,
+      })
+    );
   } catch (err: unknown) {
     const e = err as Error & { status?: number };
     return errorResponse(e.status || 500, e.message || 'Processing failed');
