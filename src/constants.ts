@@ -9,6 +9,7 @@ export const TENANTS: Record<string, string> = {
 export const ENGINE_KEYS = new Set([
   'format', 'w', 'width', 'h', 'height', 'q', 'quality', 'avatar', 'fit', 'position',
   'blur', 'sharpen', '__path', 'cw', 'cropwidth', 'cropWidth', 'ch', 'cropheight', 'cropHeight',
+  'rotate', 'flip', 'fliph', 'flop', 'flipv', 'grayscale', 'greyscale',
 ]);
 
 export const MIME: Record<string, string> = {

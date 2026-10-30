@@ -1,4 +1,15 @@
-import { PhotonImage, resize, crop, gaussian_blur, sharpen, SamplingFilter } from '@cf-wasm/photon';
+import {
+  PhotonImage,
+  resize,
+  crop,
+  gaussian_blur,
+  sharpen,
+  rotate,
+  fliph,
+  flipv,
+  grayscale_human_corrected,
+  SamplingFilter,
+} from '@cf-wasm/photon';
 import { Resvg } from '@cf-wasm/resvg';
 import {
   MIME,
@@ -244,6 +255,44 @@ async function transformRaster(
 
   if (query.sharpen === 'true' || query.sharpen === '1') {
     sharpen(image);
+  }
+
+  if (query.rotate) {
+    const angle = parseFloat(query.rotate);
+    if (!isNaN(angle) && angle !== 0) {
+      const old = image;
+      image = rotate(image, angle);
+      toFree.push(old);
+    }
+  }
+
+  if (
+    query.flip === 'h' ||
+    query.flip === 'true' ||
+    query.flip === '1' ||
+    query.fliph === '1' ||
+    query.fliph === 'true'
+  ) {
+    fliph(image);
+  }
+
+  if (
+    query.flip === 'v' ||
+    query.flop === 'true' ||
+    query.flop === '1' ||
+    query.flipv === '1' ||
+    query.flipv === 'true'
+  ) {
+    flipv(image);
+  }
+
+  if (
+    query.grayscale === 'true' ||
+    query.grayscale === '1' ||
+    query.greyscale === 'true' ||
+    query.greyscale === '1'
+  ) {
+    grayscale_human_corrected(image);
   }
 
   const enc = encodeImage(image, ext, opts.quality);

@@ -1,12 +1,18 @@
 {
   "version": 1,
   "include": [
-    "/*"
+    "/tn/*",
+    "/*.tn/*",
+    "/ginfo/*",
+    "/*.ginfo/*",
+    "/gcom/*",
+    "/*.gcom/*",
+    "/gname/*",
+    "/*.gname/*",
+    "/ecn/*",
+    "/*.ecn/*",
+    "/api",
+    "/health"
   ],
-  "exclude": [
-    "/",
-    "/index.html",
-    "/favicon.ico",
-    "/robots.txt"
-  ]
+  "exclude": []
 }

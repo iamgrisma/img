@@ -441,29 +441,39 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 7 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 07</span>
-      <h3 style="margin-top: 8px;">Quality Tuning & Creative Filters</h3>
-      <p>Fine-tune compression levels or apply visual effects:</p>
+      <h3 style="margin-top: 8px;">Sharp-Compatible Filters, Rotation & Grayscale</h3>
+      <p>Supports all classic Sharp image transformations directly in WebAssembly:</p>
       <pre># Quality setting (1 to 100, default 85):
 GET /object.gcom/photo-jpg.webp?q=92   # High quality photography
 GET /object.gcom/photo-jpg.webp?q=60   # Mobile lightweight preview
 
-# Creative filters:
+# Rotation & Flipping (Sharp parity):
+GET /object.gcom/photo-jpg.webp?rotate=90   # Rotate 90 degrees clockwise
+GET /object.gcom/photo-jpg.webp?flip=h      # Horizontal mirror flip
+GET /object.gcom/photo-jpg.webp?flop=1      # Vertical flip
+
+# Color & Creative filters:
+GET /object.gcom/photo-jpg.webp?grayscale=1       # Human-eye corrected black & white
 GET /object.gcom/photo-jpg.webp?w=800&amp;blur=6      # Gaussian blur (preview placeholders)
-GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for high-detail graphics</pre>
+GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for crisp high-detail graphics</pre>
     </div>
 
     <!-- Scenario 8 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 08</span>
-      <h3 style="margin-top: 8px;">404 Flooding & Negative Caching Defense</h3>
-      <p>If an asset is deleted or does not exist at the upstream origin:</p>
-      <pre>HTTP/1.1 404 Not Found
-Content-Type: application/json; charset=utf-8
-Cache-Control: public, max-age=300, s-maxage=300
-CDN-Cache-Control: public, max-age=300
-
-{"error":"Upstream image not found","status":404}</pre>
-      <p><strong>Defense Mechanism:</strong> The 404 is stored in Cloudflare's Edge Cache for <strong>300 seconds (5 minutes)</strong>. If bots or malicious attackers send 100,000 requests for invalid images, Cloudflare Edge absorbs them, keeping your daily Worker invocation quota completely safe.</p>
+      <h3 style="margin-top: 8px;">Edge-Level Route Defense & 404 Shield (Zero-Worker Hit)</h3>
+      <p>Protection against quota drainage, scanning bots, and DDoS flooding:</p>
+      <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.93rem; margin-bottom: 12px;">
+        <li><strong>Random/Junk Paths (e.g. <code>/randoafaslkdaf</code>, <code>/wp-login.php</code>):</strong> 
+          Filtered immediately at the Cloudflare Edge CDN using <code>_routes.json</code> whitelist. Never touches or invokes the Worker function (<strong>0 Worker Requests</strong>, 0ms CPU).
+        </li>
+        <li><strong>Deleted/Missing Upstream Images:</strong> 
+          When an image does not exist on origin, the 404 response is negative-cached for <strong>300 seconds (5 minutes)</strong>. Subsequent requests are absorbed entirely by Cloudflare CDN cache.
+        </li>
+      </ul>
+      <pre># Edge Routing Defense (_routes.json):
+Only valid tenant routes (/tn/*, /*.tn/*, /ginfo/*, /gcom/*, /gname/*, /ecn/*) invoke the Worker.
+All non-image paths are dropped by Cloudflare Edge as instant 404s without consuming Worker quota!</pre>
     </div>
 
     <!-- Scenario 9 -->

@@ -135,6 +135,13 @@ export function needsTransform(query: Record<string, string>, opts: TransformOpt
       query.q ||
       query.quality ||
       query.blur ||
-      query.sharpen
+      query.sharpen ||
+      query.rotate ||
+      query.flip ||
+      query.fliph ||
+      query.flop ||
+      query.flipv ||
+      query.grayscale ||
+      query.greyscale
   );
 }
