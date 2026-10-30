@@ -74,7 +74,7 @@
       background: #030712;
       border: 1px solid var(--border);
       border-radius: 8px;
-      height: 220px;
+      height: 210px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -83,7 +83,7 @@
       padding: 8px;
     }
     @media (min-width: 768px) {
-      .stage { height: 340px; }
+      .stage { height: 320px; }
     }
     .preview-img {
       max-width: 100%;
@@ -117,38 +117,75 @@
       gap: 8px;
     }
 
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
       gap: 8px;
     }
-
-    .control-group {
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-    }
-    .control-group label {
-      font-size: 0.68rem;
-      font-weight: 600;
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       color: var(--muted);
     }
-    .control-group select {
+    .preset-select {
       background: #090d16;
-      color: #f8fafc;
+      color: var(--accent);
       border: 1px solid var(--border);
-      border-radius: 5px;
-      padding: 5px 8px;
-      font-size: 0.78rem;
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.72rem;
       font-family: inherit;
       outline: none;
       cursor: pointer;
+    }
+
+    /* Fields Grid */
+    .fields-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+    @media (max-width: 460px) {
+      .fields-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+      }
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .field label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--muted);
+    }
+    .field input, .field select {
+      background: #090d16;
+      color: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 4px 6px;
+      font-size: 0.78rem;
+      font-family: inherit;
+      outline: none;
       width: 100%;
       transition: border-color 0.15s;
+      -moz-appearance: textfield;
     }
-    .control-group select:focus {
+    .field input::-webkit-outer-spin-button,
+    .field input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    .field input:focus, .field select:focus {
       border-color: var(--accent);
     }
 
@@ -196,7 +233,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.76rem;
       outline: none;
-      padding: 6px 0;
+      padding: 5px 0;
     }
     .url-bar button {
       background: rgba(56, 189, 248, 0.15);
@@ -256,32 +293,75 @@
     <!-- Minimal Controls (Below Image) -->
     <div class="controls-card">
 
-      <div class="controls-grid">
-        <div class="control-group">
-          <label for="presetSelect">Preset</label>
-          <select id="presetSelect" onchange="onPresetChange(this.value)">
-            <option value="original">Original</option>
-            <option value="social">Social Card (1200x630)</option>
-            <option value="avatar">Avatar (256x256)</option>
-            <option value="mobile">Mobile (320px)</option>
-            <option value="noir">Noir (B&amp;W)</option>
-            <option value="blur">Blur Placeholder</option>
-            <option value="custom" disabled>Custom</option>
+      <div class="card-header">
+        <span class="card-title">Transformation Parameters</span>
+        <select id="selPreset" class="preset-select" onchange="onPresetSelect(this.value)">
+          <option value="">Load Preset...</option>
+          <option value="reset">Original (Reset)</option>
+          <option value="social">Social OG (1200x630)</option>
+          <option value="avatar">Avatar (256x256 Top)</option>
+          <option value="mobile">Mobile (320px, q70)</option>
+          <option value="noir">Noir (B&amp;W)</option>
+          <option value="blur">Blur Placeholder</option>
+        </select>
+      </div>
+
+      <!-- Enterable Fields Grid (No sliders, direct inputs) -->
+      <div class="fields-grid">
+        <div class="field">
+          <label for="inpW">Width</label>
+          <input type="number" id="inpW" placeholder="auto" min="1" max="4000" oninput="onFieldChange()">
+        </div>
+
+        <div class="field">
+          <label for="inpH">Height</label>
+          <input type="number" id="inpH" placeholder="auto" min="1" max="4000" oninput="onFieldChange()">
+        </div>
+
+        <div class="field">
+          <label for="selFit">Fit</label>
+          <select id="selFit" onchange="onFieldChange()">
+            <option value="">auto</option>
+            <option value="cover">cover</option>
+            <option value="contain">contain</option>
+            <option value="fill">fill</option>
+            <option value="inside">inside</option>
           </select>
         </div>
 
-        <div class="control-group">
-          <label for="formatSelect">Format</label>
-          <select id="formatSelect" onchange="onFormatChange(this.value)">
+        <div class="field">
+          <label for="selPos">Position</label>
+          <select id="selPos" onchange="onFieldChange()">
+            <option value="">center</option>
+            <option value="top">top</option>
+            <option value="bottom">bottom</option>
+            <option value="left">left</option>
+            <option value="right">right</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="selFmt">Format</label>
+          <select id="selFmt" onchange="onFieldChange()">
             <option value="webp">WebP</option>
             <option value="png">PNG</option>
             <option value="jpg">JPEG</option>
           </select>
         </div>
 
-        <div class="control-group">
-          <label for="rotateSelect">Rotation</label>
-          <select id="rotateSelect" onchange="onRotateChange(this.value)">
+        <div class="field">
+          <label for="inpQ">Quality</label>
+          <input type="number" id="inpQ" placeholder="auto" min="1" max="100" oninput="onFieldChange()">
+        </div>
+
+        <div class="field">
+          <label for="inpBlur">Blur</label>
+          <input type="number" id="inpBlur" placeholder="0" min="0" max="25" oninput="onFieldChange()">
+        </div>
+
+        <div class="field">
+          <label for="selRot">Rotate</label>
+          <select id="selRot" onchange="onFieldChange()">
             <option value="0">0 deg</option>
             <option value="90">90 deg</option>
             <option value="180">180 deg</option>
@@ -290,21 +370,23 @@
         </div>
       </div>
 
+      <!-- Effects Row -->
       <div class="effects-row">
         <label class="cb-label">
-          <input type="checkbox" id="cbGray" onchange="onToggleEffect('grayscale', this.checked)"> Grayscale
+          <input type="checkbox" id="cbGray" onchange="onFieldChange()"> Grayscale
         </label>
         <label class="cb-label">
-          <input type="checkbox" id="cbSharp" onchange="onToggleEffect('sharpen', this.checked)"> Sharpen
+          <input type="checkbox" id="cbSharp" onchange="onFieldChange()"> Sharpen
         </label>
         <label class="cb-label">
-          <input type="checkbox" id="cbFlipH" onchange="onToggleEffect('flip', this.checked)"> Flip H
+          <input type="checkbox" id="cbFlipH" onchange="onFieldChange()"> Flip H
         </label>
         <label class="cb-label">
-          <input type="checkbox" id="cbFlipV" onchange="onToggleEffect('flop', this.checked)"> Flip V
+          <input type="checkbox" id="cbFlipV" onchange="onFieldChange()"> Flip V
         </label>
       </div>
 
+      <!-- Live Editable Command / URL Bar -->
       <div class="url-bar">
         <input type="text" id="urlInput" spellcheck="false" onkeydown="if(event.key==='Enter') onManualUrl()" onblur="onManualUrl()">
         <button type="button" id="copyBtn" onclick="copyUrl()">Copy URL</button>
@@ -312,7 +394,7 @@
 
     </div>
 
-    <p class="hint">Adjust controls or edit query parameters directly in the URL bar.</p>
+    <p class="hint">Type values directly into parameter fields or edit the URL.</p>
 
   </main>
 
@@ -321,15 +403,63 @@
   </footer>
 
   <script>
-    const BASE_PATH = 'objects.tn/wp-content/uploads/2026/10/nepal-army-rank-hierarchy-insignia-banner.webp';
-    let currentUrl = '/' + BASE_PATH;
+    const BASE_NAME = 'objects.tn/wp-content/uploads/2026/10/nepal-army-rank-hierarchy-insignia-banner';
+    let currentUrl = '/' + BASE_NAME + '.webp';
     let debounceTimer = null;
 
-    function applyUrl(url) {
+    function getFieldsState() {
+      const w = document.getElementById('inpW').value.trim();
+      const h = document.getElementById('inpH').value.trim();
+      const fit = document.getElementById('selFit').value;
+      const pos = document.getElementById('selPos').value;
+      const fmt = document.getElementById('selFmt').value;
+      const q = document.getElementById('inpQ').value.trim();
+      const blur = document.getElementById('inpBlur').value.trim();
+      const rot = document.getElementById('selRot').value;
+      const gray = document.getElementById('cbGray').checked;
+      const sharp = document.getElementById('cbSharp').checked;
+      const fliph = document.getElementById('cbFlipH').checked;
+      const flipv = document.getElementById('cbFlipV').checked;
+
+      // Determine path
+      let path = '/' + BASE_NAME;
+      if (fmt === 'webp') {
+        path += '.webp';
+      } else {
+        path += '-webp.' + fmt;
+      }
+
+      // Determine search query
+      const params = new URLSearchParams();
+      if (w && parseInt(w) > 0) params.set('w', w);
+      if (h && parseInt(h) > 0) params.set('h', h);
+      if (fit) params.set('fit', fit);
+      if (pos) params.set('position', pos);
+      if (q && parseInt(q) > 0) params.set('q', q);
+      if (blur && parseInt(blur) > 0) params.set('blur', blur);
+      if (rot && rot !== '0') params.set('rotate', rot);
+      if (gray) params.set('grayscale', '1');
+      if (sharp) params.set('sharpen', '1');
+      if (fliph) params.set('flip', 'h');
+      if (flipv) params.set('flop', '1');
+
+      const qs = params.toString();
+      return path + (qs ? '?' + qs : '');
+    }
+
+    function onFieldChange() {
+      const newUrl = getFieldsState();
+      applyUrl(newUrl, false);
+    }
+
+    function applyUrl(url, syncInputs = true) {
       if (!url.startsWith('/')) url = '/' + url;
       currentUrl = url;
       document.getElementById('urlInput').value = url;
-      syncControlsFromUrl(url);
+
+      if (syncInputs) {
+        syncInputsFromUrl(url);
+      }
 
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -341,10 +471,61 @@
       }, 120);
     }
 
+    function syncInputsFromUrl(url) {
+      const parsed = new URL(window.location.origin + url);
+      const qs = parsed.searchParams;
+
+      // Format
+      const selFmt = document.getElementById('selFmt');
+      if (parsed.pathname.includes('.png')) selFmt.value = 'png';
+      else if (parsed.pathname.includes('.jpg') || parsed.pathname.includes('.jpeg')) selFmt.value = 'jpg';
+      else selFmt.value = 'webp';
+
+      // Width & Height
+      document.getElementById('inpW').value = qs.get('w') || '';
+      document.getElementById('inpH').value = qs.get('h') || '';
+
+      // Fit & Position
+      document.getElementById('selFit').value = qs.get('fit') || '';
+      document.getElementById('selPos').value = qs.get('position') || '';
+
+      // Quality & Blur
+      document.getElementById('inpQ').value = qs.get('q') || '';
+      document.getElementById('inpBlur').value = qs.get('blur') || '';
+
+      // Rotate
+      const rot = qs.get('rotate') || '0';
+      document.getElementById('selRot').value = ['0', '90', '180', '270'].includes(rot) ? rot : '0';
+
+      // Effects
+      document.getElementById('cbGray').checked = qs.get('grayscale') === '1';
+      document.getElementById('cbSharp').checked = qs.get('sharpen') === '1';
+      document.getElementById('cbFlipH').checked = qs.get('flip') === 'h';
+      document.getElementById('cbFlipV').checked = qs.get('flop') === '1';
+    }
+
+    function onPresetSelect(name) {
+      if (!name) return;
+      if (name === 'reset') {
+        applyUrl('/' + BASE_NAME + '.webp', true);
+      } else if (name === 'social') {
+        applyUrl('/' + BASE_NAME + '.webp?w=1200&h=630&fit=cover', true);
+      } else if (name === 'avatar') {
+        applyUrl('/' + BASE_NAME + '.webp?w=256&h=256&fit=cover&position=top', true);
+      } else if (name === 'mobile') {
+        applyUrl('/' + BASE_NAME + '.webp?w=320&q=70', true);
+      } else if (name === 'noir') {
+        applyUrl('/' + BASE_NAME + '.webp?grayscale=1&sharpen=1', true);
+      } else if (name === 'blur') {
+        applyUrl('/' + BASE_NAME + '.webp?w=400&blur=8', true);
+      }
+      document.getElementById('selPreset').value = '';
+    }
+
     function onManualUrl() {
       const val = document.getElementById('urlInput').value.trim();
       if (val && val !== currentUrl) {
-        applyUrl(val);
+        applyUrl(val, true);
       }
     }
 
@@ -367,106 +548,8 @@
       });
     }
 
-    function onPresetChange(val) {
-      if (val === 'original') {
-        applyUrl('/' + BASE_PATH);
-      } else if (val === 'social') {
-        applyUrl('/' + BASE_PATH + '?w=1200&h=630&fit=cover');
-      } else if (val === 'avatar') {
-        applyUrl('/' + BASE_PATH + '?w=256&h=256&fit=cover&position=top');
-      } else if (val === 'mobile') {
-        applyUrl('/' + BASE_PATH + '?w=320&q=70');
-      } else if (val === 'noir') {
-        applyUrl('/' + BASE_PATH + '?grayscale=1&sharpen=1');
-      } else if (val === 'blur') {
-        applyUrl('/' + BASE_PATH + '?w=400&blur=8');
-      }
-    }
-
-    function onFormatChange(fmt) {
-      const parsed = new URL(window.location.origin + currentUrl);
-      let path = parsed.pathname;
-      if (fmt === 'webp') {
-        path = path.replace(/-webp\.(png|jpg|jpeg)/, '.webp').replace(/\.(png|jpg|jpeg)$/, '.webp');
-      } else {
-        path = path.replace(/\.webp$/, '-webp.' + fmt).replace(/-webp\.(png|jpg|jpeg)$/, '-webp.' + fmt);
-      }
-      const qs = parsed.searchParams.toString();
-      applyUrl(path + (qs ? '?' + qs : ''));
-    }
-
-    function onRotateChange(deg) {
-      const parsed = new URL(window.location.origin + currentUrl);
-      if (deg === '0') {
-        parsed.searchParams.delete('rotate');
-      } else {
-        parsed.searchParams.set('rotate', deg);
-      }
-      const qs = parsed.searchParams.toString();
-      applyUrl(parsed.pathname + (qs ? '?' + qs : ''));
-    }
-
-    function onToggleEffect(key, checked) {
-      const parsed = new URL(window.location.origin + currentUrl);
-      if (key === 'grayscale') {
-        if (checked) parsed.searchParams.set('grayscale', '1');
-        else parsed.searchParams.delete('grayscale');
-      } else if (key === 'sharpen') {
-        if (checked) parsed.searchParams.set('sharpen', '1');
-        else parsed.searchParams.delete('sharpen');
-      } else if (key === 'flip') {
-        if (checked) parsed.searchParams.set('flip', 'h');
-        else parsed.searchParams.delete('flip');
-      } else if (key === 'flop') {
-        if (checked) parsed.searchParams.set('flop', '1');
-        else parsed.searchParams.delete('flop');
-      }
-      const qs = parsed.searchParams.toString();
-      applyUrl(parsed.pathname + (qs ? '?' + qs : ''));
-    }
-
-    function syncControlsFromUrl(url) {
-      const parsed = new URL(window.location.origin + url);
-      const qs = parsed.searchParams;
-
-      // Format select
-      const formatSelect = document.getElementById('formatSelect');
-      if (parsed.pathname.includes('.png')) formatSelect.value = 'png';
-      else if (parsed.pathname.includes('.jpg') || parsed.pathname.includes('.jpeg')) formatSelect.value = 'jpg';
-      else formatSelect.value = 'webp';
-
-      // Rotate select
-      const rot = qs.get('rotate') || '0';
-      document.getElementById('rotateSelect').value = ['0', '90', '180', '270'].includes(rot) ? rot : '0';
-
-      // Checkboxes
-      document.getElementById('cbGray').checked = qs.get('grayscale') === '1';
-      document.getElementById('cbSharp').checked = qs.get('sharpen') === '1';
-      document.getElementById('cbFlipH').checked = qs.get('flip') === 'h';
-      document.getElementById('cbFlipV').checked = qs.get('flop') === '1';
-
-      // Preset select
-      const presetSelect = document.getElementById('presetSelect');
-      const search = parsed.search;
-      if (!search && formatSelect.value === 'webp') {
-        presetSelect.value = 'original';
-      } else if (search === '?w=1200&h=630&fit=cover') {
-        presetSelect.value = 'social';
-      } else if (search === '?w=256&h=256&fit=cover&position=top') {
-        presetSelect.value = 'avatar';
-      } else if (search === '?w=320&q=70') {
-        presetSelect.value = 'mobile';
-      } else if (search === '?grayscale=1&sharpen=1') {
-        presetSelect.value = 'noir';
-      } else if (search === '?w=400&blur=8') {
-        presetSelect.value = 'blur';
-      } else {
-        presetSelect.value = 'custom';
-      }
-    }
-
     window.addEventListener('DOMContentLoaded', () => {
-      applyUrl('/' + BASE_PATH);
+      applyUrl('/' + BASE_NAME + '.webp', true);
     });
   </script>
 
