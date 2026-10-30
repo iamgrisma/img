@@ -1882,7 +1882,7 @@ var RASTER_MAX_SIZE = 25e6;
 var FETCH_TIMEOUT_MS = 5e3;
 var DEFAULT_SVG_WIDTH = 1200;
 var DEFAULT_QUALITY = 85;
-var MAX_DIMENSION = 3840;
+var MAX_DIMENSION = 2560;
 var MAX_UPSCALE_FACTOR = 4;
 
 // ../routing.ts
@@ -3595,6 +3595,13 @@ function cropOffset(d, t, p) {
   return Math.max(0, Math.floor((d - t) / 2));
 }
 __name(cropOffset, "cropOffset");
+function getFilter(sw, sh, tw, th) {
+  if (tw > sw || th > sh || tw * th > 25e5) {
+    return SamplingFilter.Triangle;
+  }
+  return SamplingFilter.Lanczos3;
+}
+__name(getFilter, "getFilter");
 function executeResize(img, tw, th, fit, pos, toFree) {
   const sw = img.get_width();
   const sh = img.get_height();
@@ -3602,7 +3609,7 @@ function executeResize(img, tw, th, fit, pos, toFree) {
   const tr = tw / th;
   if (fit === "fill") {
     const old = img;
-    const res = resize(img, tw, th, SamplingFilter.Lanczos3);
+    const res = resize(img, tw, th, getFilter(sw, sh, tw, th));
     toFree.push(old);
     return res;
   }
@@ -3617,7 +3624,7 @@ function executeResize(img, tw, th, fit, pos, toFree) {
       rw = Math.max(1, Math.round(th * sr));
     }
     const old = img;
-    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    const res = resize(img, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
     return res;
   }
@@ -3626,7 +3633,7 @@ function executeResize(img, tw, th, fit, pos, toFree) {
     const rw = Math.max(1, Math.round(sw * s));
     const rh = Math.max(1, Math.round(sh * s));
     const old = img;
-    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    const res = resize(img, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
     return res;
   }
@@ -3649,7 +3656,7 @@ function executeResize(img, tw, th, fit, pos, toFree) {
   }
   if (current.get_width() !== tw || current.get_height() !== th) {
     const old = current;
-    current = resize(current, tw, th, SamplingFilter.Lanczos3);
+    current = resize(current, tw, th, getFilter(current.get_width(), current.get_height(), tw, th));
     toFree.push(old);
   }
   return current;
@@ -3809,7 +3816,7 @@ async function transformRaster(input, query, opts, ext, engine) {
       rw = Math.max(1, Math.round(sw * (targetH / sh)));
     }
     const old = image;
-    image = resize(image, rw, rh, SamplingFilter.Lanczos3);
+    image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
   }
   if (query.blur) {
@@ -4051,7 +4058,7 @@ var src_default = app;
 // [[path]].ts
 var onRequest = handle(src_default);
 
-// ../../.wrangler/tmp/pages-dhMnjx/functionsRoutes-0.3211469691862251.mjs
+// ../../.wrangler/tmp/pages-hibh9v/functionsRoutes-0.267764704866586.mjs
 var routes = [
   {
     routePath: "/:path*",

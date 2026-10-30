@@ -70,6 +70,15 @@ function cropOffset(d: number, t: number, p: string): number {
   return Math.max(0, Math.floor((d - t) / 2));
 }
 
+function getFilter(sw: number, sh: number, tw: number, th: number): SamplingFilter {
+  // Use Bilinear (Triangle) when upscaling or when target canvas exceeds 2.5 megapixels
+  // to prevent exceeding Cloudflare edge CPU time limits while maintaining high visual quality
+  if (tw > sw || th > sh || tw * th > 2_500_000) {
+    return SamplingFilter.Triangle;
+  }
+  return SamplingFilter.Lanczos3;
+}
+
 function executeResize(
   img: PhotonImage,
   tw: number,
@@ -85,7 +94,7 @@ function executeResize(
 
   if (fit === 'fill') {
     const old = img;
-    const res = resize(img, tw, th, SamplingFilter.Lanczos3);
+    const res = resize(img, tw, th, getFilter(sw, sh, tw, th));
     toFree.push(old);
     return res;
   }
@@ -101,7 +110,7 @@ function executeResize(
       rw = Math.max(1, Math.round(th * sr));
     }
     const old = img;
-    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    const res = resize(img, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
     return res;
   }
@@ -111,7 +120,7 @@ function executeResize(
     const rw = Math.max(1, Math.round(sw * s));
     const rh = Math.max(1, Math.round(sh * s));
     const old = img;
-    const res = resize(img, rw, rh, SamplingFilter.Lanczos3);
+    const res = resize(img, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
     return res;
   }
@@ -140,7 +149,7 @@ function executeResize(
 
   if (current.get_width() !== tw || current.get_height() !== th) {
     const old = current;
-    current = resize(current, tw, th, SamplingFilter.Lanczos3);
+    current = resize(current, tw, th, getFilter(current.get_width(), current.get_height(), tw, th));
     toFree.push(old);
   }
 
@@ -330,7 +339,7 @@ async function transformRaster(
       rw = Math.max(1, Math.round(sw * (targetH! / sh)));
     }
     const old = image;
-    image = resize(image, rw, rh, SamplingFilter.Lanczos3);
+    image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
     toFree.push(old);
   }
 

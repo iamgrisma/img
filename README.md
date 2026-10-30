@@ -56,8 +56,8 @@ https://imagengine.pages.dev/objects.tn/wp-content/uploads/2026/10/banner.jpg?fo
 
 | Parameter | Type | Default | Description |
 |:---|:---|:---|:---|
-| `w`, `width` | `integer` | source | Target width in pixels (1 to 3840). Subject to 4x upscale ceiling. |
-| `h`, `height` | `integer` | source | Target height in pixels (1 to 3840). Subject to 4x upscale ceiling. |
+| `w`, `width` | `integer` | source | Target width in pixels (1 to 2560). Subject to 4x upscale ceiling. |
+| `h`, `height` | `integer` | source | Target height in pixels (1 to 2560). Subject to 4x upscale ceiling. |
 | `cw`, `cropwidth` | `integer` | source | Source crop width in pixels. Crops from center before resizing. |
 | `ch`, `cropheight` | `integer` | source | Source crop height in pixels. Crops from center before resizing. |
 | `fit` | `string` | `cover` | Resize fitting strategy: `cover`, `contain`, `fill`, `inside`, `outside`. |

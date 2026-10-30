@@ -11,7 +11,7 @@ ImagEngine is a zero-latency, WebAssembly-powered image optimization and transfo
 ### Core File Structure
 
 - `src/constants.ts`
-  - Defines tenant mappings (`TENANTS`), engine reserved query parameter keys (`ENGINE_KEYS`), MIME types, cache header policies, and memory/dimension limits (`MAX_DIMENSION = 3840`, `MAX_UPSCALE_FACTOR = 4`, `RASTER_MAX_SIZE = 25_000_000`, `SVG_MAX_SIZE = 2_000_000`, `FETCH_TIMEOUT_MS = 5_000`).
+  - Defines tenant mappings (`TENANTS`), engine reserved query parameter keys (`ENGINE_KEYS`), MIME types, cache header policies, and memory/dimension limits (`MAX_DIMENSION = 2560`, `MAX_UPSCALE_FACTOR = 4`, `RASTER_MAX_SIZE = 25_000_000`, `SVG_MAX_SIZE = 2_000_000`, `FETCH_TIMEOUT_MS = 5_000`).
 - `src/routing.ts`
   - Handles URL route parsing and upstream origin resolution.
   - Supports dual route patterns: slug-based conversion (`path-origExt.targetExt`) and query parameter-based conversion (`path.origExt?format=targetExt`).
@@ -58,9 +58,10 @@ All agents and contributors must strictly adhere to the following rules:
 - Doing so with extreme aspect ratios (e.g. 600x351 requested as 600x4000) causes intermediate dimensions of thousands of pixels (e.g. 6838x4000 = 27.3 megapixels), consuming over 100MB of RAM and crashing the Cloudflare Worker with CPU or Out-of-Memory limits.
 - Always calculate the target aspect ratio and crop the source image first, then resize the cropped slice to the target dimensions.
 
-### Invariant 4: Upscale Clamping (4x Stickiness)
-- To prevent abuse and memory exhaustion, image upscaling is strictly capped at `4x` the source image dimensions, and globally capped at `MAX_DIMENSION = 3840`.
+### Invariant 4: Upscale Clamping and Adaptive Filter
+- To prevent abuse and memory exhaustion, image upscaling is strictly capped at `4x` the source image dimensions, and globally capped at `MAX_DIMENSION = 2560`.
 - If an incoming request asks for dimensions exceeding 4x the original, the engine clamps to `sw * 4` (or `sh * 4`). For example, requesting 1800px on a 400px image produces a 1600px image.
+- When upscaling or generating large output canvases (>2.5 megapixels), the engine adaptively switches from 36-tap `Lanczos3` to fast `Triangle` (Bilinear) interpolation to prevent exceeding Cloudflare's 50ms CPU limit.
 
 ### Invariant 5: Memory Management and Freeing
 - Objects created via Photon (`PhotonImage`) allocate memory within the WebAssembly linear heap.
