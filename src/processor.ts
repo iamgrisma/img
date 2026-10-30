@@ -1,6 +1,5 @@
 import { PhotonImage, resize, crop, gaussian_blur, sharpen, SamplingFilter } from '@cf-wasm/photon';
-import { Resvg, initWasm } from '@resvg/resvg-wasm';
-import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
+import { Resvg } from '@cf-wasm/resvg';
 import {
   MIME,
   SVG_MAX_SIZE,
@@ -10,14 +9,6 @@ import {
 } from './constants';
 import { normalizeExt } from './routing';
 import type { TransformOptions } from './routing';
-
-let resvgReady = false;
-async function ensureResvg(): Promise<void> {
-  if (!resvgReady) {
-    await initWasm(resvgWasm);
-    resvgReady = true;
-  }
-}
 
 export interface SourceData {
   type: string;
@@ -53,7 +44,6 @@ function cleanSvg(svg: string): string {
 }
 
 async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8Array> {
-  await ensureResvg();
   const resvg = new Resvg(cleanSvg(svgText), {
     fitTo: { mode: 'width', value: targetWidth },
     background: 'rgba(255,255,255,0)',
