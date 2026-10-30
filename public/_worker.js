@@ -3604,7 +3604,11 @@ async function fetchSource(url) {
 }
 __name(fetchSource, "fetchSource");
 function cleanSvg(svg) {
-  return svg.replace(/&[a-zA-Z0-9#]*…/g, "\u2026").replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, "&amp;");
+  return svg.replace(/&[a-zA-Z0-9#]*…/g, "\u2026").replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, "&amp;").replace(/<feGaussianBlur[^>]*stdDeviation=["']([0-9.]+)["'][^>]*\/?>/gi, (match3, val) => {
+    const n = parseFloat(val);
+    if (n > 10) return "";
+    return match3;
+  });
 }
 __name(cleanSvg, "cleanSvg");
 async function rasterizeSvg(svgText, targetWidth) {
@@ -3612,6 +3616,8 @@ async function rasterizeSvg(svgText, targetWidth) {
   const resvg = new Resvg3(cleanSvg(svgText), {
     fitTo: { mode: "width", value: targetWidth },
     background: "rgba(255,255,255,0)",
+    shapeRendering: 0,
+    textRendering: 0,
     font: {
       loadSystemFonts: false,
       fontBuffers,
@@ -4098,7 +4104,7 @@ var src_default = app;
 // [[path]].ts
 var onRequest = handle(src_default);
 
-// ../../.wrangler/tmp/pages-loyyEm/functionsRoutes-0.74062174414649.mjs
+// ../../.wrangler/tmp/pages-RIhKqY/functionsRoutes-0.20921619138855818.mjs
 var routes = [
   {
     routePath: "/:path*",

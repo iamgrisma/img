@@ -53,7 +53,15 @@ export async function fetchSource(url: string): Promise<SourceData> {
 }
 
 function cleanSvg(svg: string): string {
-  return svg.replace(/&[a-zA-Z0-9#]*…/g, '…').replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, '&amp;');
+  return svg
+    .replace(/&[a-zA-Z0-9#]*…/g, '…')
+    .replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, '&amp;')
+    // Strip computationally abusive large Gaussian blurs (stdDeviation > 10) that choke edge CPU
+    .replace(/<feGaussianBlur[^>]*stdDeviation=["']([0-9.]+)["'][^>]*\/?>/gi, (match, val) => {
+      const n = parseFloat(val);
+      if (n > 10) return '';
+      return match;
+    });
 }
 
 async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8Array> {
@@ -61,6 +69,8 @@ async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8
   const resvg = new Resvg(cleanSvg(svgText), {
     fitTo: { mode: 'width', value: targetWidth },
     background: 'rgba(255,255,255,0)',
+    shapeRendering: 0,
+    textRendering: 0,
     font: {
       loadSystemFonts: false,
       fontBuffers,
