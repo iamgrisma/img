@@ -4,7 +4,6 @@ import {
   crop,
   gaussian_blur,
   sharpen,
-  rotate,
   fliph,
   flipv,
   grayscale_human_corrected,
@@ -136,6 +135,71 @@ function safeCrop(img: PhotonImage, x: number, y: number, w: number, h: number):
   return crop(img, x1, y1, x2, y2);
 }
 
+function rotateLossless(image: PhotonImage, degrees: number): PhotonImage {
+  const norm = ((Math.round(degrees) % 360) + 360) % 360;
+  if (norm === 0) return image;
+
+  const w = image.get_width();
+  const h = image.get_height();
+  const src = image.get_raw_pixels();
+
+  if (norm === 90) {
+    const newW = h;
+    const newH = w;
+    const dest = new Uint8Array(newW * newH * 4);
+    for (let y = 0; y < h; y++) {
+      const srcRow = y * w * 4;
+      for (let x = 0; x < w; x++) {
+        const srcIdx = srcRow + x * 4;
+        const destIdx = (x * newW + (h - 1 - y)) * 4;
+        dest[destIdx] = src[srcIdx];
+        dest[destIdx + 1] = src[srcIdx + 1];
+        dest[destIdx + 2] = src[srcIdx + 2];
+        dest[destIdx + 3] = src[srcIdx + 3];
+      }
+    }
+    return new PhotonImage(dest, newW, newH);
+  }
+
+  if (norm === 180) {
+    const dest = new Uint8Array(w * h * 4);
+    for (let y = 0; y < h; y++) {
+      const srcRow = y * w * 4;
+      const destRow = (h - 1 - y) * w * 4;
+      for (let x = 0; x < w; x++) {
+        const srcIdx = srcRow + x * 4;
+        const destIdx = destRow + (w - 1 - x) * 4;
+        dest[destIdx] = src[srcIdx];
+        dest[destIdx + 1] = src[srcIdx + 1];
+        dest[destIdx + 2] = src[srcIdx + 2];
+        dest[destIdx + 3] = src[srcIdx + 3];
+      }
+    }
+    return new PhotonImage(dest, w, h);
+  }
+
+  if (norm === 270) {
+    const newW = h;
+    const newH = w;
+    const dest = new Uint8Array(newW * newH * 4);
+    for (let y = 0; y < h; y++) {
+      const srcRow = y * w * 4;
+      for (let x = 0; x < w; x++) {
+        const srcIdx = srcRow + x * 4;
+        const destIdx = ((w - 1 - x) * newW + y) * 4;
+        dest[destIdx] = src[srcIdx];
+        dest[destIdx + 1] = src[srcIdx + 1];
+        dest[destIdx + 2] = src[srcIdx + 2];
+        dest[destIdx + 3] = src[srcIdx + 3];
+      }
+    }
+    return new PhotonImage(dest, newW, newH);
+  }
+
+  const nearest = Math.round(norm / 90) * 90;
+  return rotateLossless(image, nearest);
+}
+
 function encodeImage(
   img: PhotonImage,
   ext: string,
@@ -261,7 +325,7 @@ async function transformRaster(
     const angle = parseFloat(query.rotate);
     if (!isNaN(angle) && angle !== 0) {
       const old = image;
-      image = rotate(image, angle);
+      image = rotateLossless(image, angle);
       toFree.push(old);
     }
   }

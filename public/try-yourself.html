@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ImagEngine Playground - Interactive Image Optimization Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>Transformation Playground - ImagEngine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -22,12 +22,13 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       background: var(--bg);
       color: var(--text-main);
-      line-height: 1.6;
+      line-height: 1.5;
       padding: 0;
       margin: 0;
+      -webkit-font-smoothing: antialiased;
     }
     nav {
       display: flex;
@@ -35,17 +36,17 @@
       justify-content: space-between;
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px 24px;
+      padding: 16px 20px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .logo {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 800;
       color: #fff;
       text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      letter-spacing: -0.02em;
     }
     .logo span {
       color: var(--accent);
@@ -53,80 +54,113 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 16px;
       list-style: none;
+      flex-wrap: wrap;
     }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 500;
       transition: color 0.2s;
+      padding: 6px 4px;
     }
     .nav-links a:hover, .nav-links a.active {
       color: #fff;
     }
     .nav-btn {
-      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      background: #0284c7;
       color: #fff !important;
-      padding: 8px 18px;
-      border-radius: 8px;
+      padding: 8px 16px !important;
+      border-radius: 6px;
       font-weight: 600 !important;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover {
+      background: #0369a1;
     }
     .playground-header {
       text-align: center;
-      padding: 40px 20px 20px;
+      padding: 32px 16px 16px;
       max-width: 800px;
       margin: 0 auto;
     }
     .playground-header h1 {
-      font-size: 2.4rem;
+      font-size: 2.2rem;
       font-weight: 800;
       letter-spacing: -0.03em;
       margin-bottom: 8px;
-      background: linear-gradient(to right, #ffffff, #38bdf8);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      color: #fff;
     }
     .playground-header p {
       color: var(--text-muted);
-      font-size: 1.05rem;
+      font-size: 1rem;
     }
     .container {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 20px 24px 80px;
+      padding: 16px 16px 60px;
       display: grid;
       grid-template-columns: 440px 1fr;
-      gap: 32px;
+      gap: 24px;
     }
     @media (max-width: 960px) {
-      .container { grid-template-columns: 1fr; }
+      .container {
+        grid-template-columns: 1fr;
+        padding-bottom: 40px;
+      }
+      .playground-header h1 {
+        font-size: 1.8rem;
+      }
+    }
+    @media (max-width: 480px) {
+      nav {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .nav-links {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 12px;
+      }
+      .playground-header {
+        text-align: left;
+        padding: 20px 16px 12px;
+      }
+      .playground-header h1 {
+        font-size: 1.5rem;
+      }
+      .container {
+        padding: 12px 12px 40px;
+      }
     }
     .panel {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 24px;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    @media (max-width: 480px) {
+      .panel {
+        padding: 16px;
+      }
     }
     .panel-title {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       font-weight: 700;
       color: #f1f5f9;
-      margin-bottom: 18px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
+      margin-bottom: 16px;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 12px;
+      padding-bottom: 10px;
     }
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 16px;
     }
     .form-label {
       display: flex;
       justify-content: space-between;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       font-weight: 600;
       color: #cbd5e1;
       margin-bottom: 6px;
@@ -141,8 +175,8 @@
       border: 1px solid var(--code-border);
       color: #fff;
       padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 0.92rem;
+      border-radius: 6px;
+      font-size: 0.9rem;
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
@@ -154,12 +188,17 @@
       width: 100%;
       accent-color: var(--accent);
       cursor: pointer;
+      height: 6px;
     }
     .presets-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(2, 1fr);
       gap: 8px;
-      margin-bottom: 20px;
+    }
+    @media (max-width: 400px) {
+      .presets-grid {
+        grid-template-columns: 1fr;
+      }
     }
     .preset-btn {
       background: rgba(56, 189, 248, 0.08);
@@ -167,7 +206,7 @@
       color: #e0f2fe;
       padding: 8px 10px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
@@ -179,56 +218,65 @@
     }
     .radio-group {
       display: flex;
-      gap: 12px;
+      gap: 8px;
       flex-wrap: wrap;
     }
     .radio-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.88rem;
-      color: #e2e8f0;
-      cursor: pointer;
-      background: var(--code-bg);
-      padding: 6px 12px;
-      border-radius: 6px;
-      border: 1px solid var(--code-border);
-    }
-    .checkbox-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .checkbox-label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: #e2e8f0;
       cursor: pointer;
       background: var(--code-bg);
       padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid var(--code-border);
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    @media (max-width: 400px) {
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      cursor: pointer;
+      background: var(--code-bg);
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--code-border);
     }
     .url-box {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 20px;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
+      flex-wrap: wrap;
     }
     .url-text {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #7dd3fc;
       overflow-x: auto;
       white-space: nowrap;
-      flex: 1;
+      flex: 1 1 200px;
+      padding: 4px 0;
     }
     .copy-btn {
       background: rgba(56, 189, 248, 0.15);
@@ -249,29 +297,31 @@
     .preview-container {
       background: #030712;
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      min-height: 440px;
+      border-radius: 10px;
+      min-height: 320px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      padding: 20px;
+      padding: 16px;
     }
     .preview-img {
       max-width: 100%;
-      max-height: 520px;
-      border-radius: 8px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      height: auto;
+      max-height: 480px;
+      border-radius: 6px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       transition: opacity 0.2s;
+      object-fit: contain;
     }
     .preview-img.loading {
       opacity: 0.4;
     }
     .spinner {
       position: absolute;
-      width: 36px;
-      height: 36px;
+      width: 32px;
+      height: 32px;
       border: 3px solid rgba(56, 189, 248, 0.2);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -283,25 +333,25 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 16px;
-      padding: 12px 16px;
+      margin-top: 14px;
+      padding: 10px 14px;
       background: rgba(255, 255, 255, 0.02);
-      border-radius: 8px;
+      border-radius: 6px;
       border: 1px solid var(--card-border);
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
       flex-wrap: wrap;
-      gap: 12px;
+      gap: 10px;
     }
     .metrics-bar strong {
       color: #f1f5f9;
     }
     footer {
       text-align: center;
-      padding: 40px 20px;
+      padding: 32px 16px;
       border-top: 1px solid var(--card-border);
       color: #64748b;
-      font-size: 0.92rem;
+      font-size: 0.88rem;
     }
     footer a {
       color: var(--accent);
@@ -315,9 +365,9 @@
 </head>
 <body>
 
-  <!-- Top Navigation -->
+  <!-- Navigation -->
   <nav>
-    <a href="/" class="logo">⚡ Imag<span>Engine</span></a>
+    <a href="/" class="logo">Imag<span>Engine</span></a>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
       <li><a href="/try-yourself.html" class="active">Try Yourself</a></li>
@@ -328,14 +378,14 @@
 
   <div class="playground-header">
     <h1>Interactive Transformation Playground</h1>
-    <p>Test real-time image conversion, dynamic cropping, and creative filters with live preview.</p>
+    <p>Test real-time image format conversion, dynamic cropping, and creative filters with live preview.</p>
   </div>
 
   <div class="container">
 
     <!-- Controls Panel -->
     <div class="panel">
-      <div class="panel-title">⚙️ Transformation Parameters</div>
+      <div class="panel-title">Transformation Parameters</div>
 
       <!-- Quick Presets -->
       <div class="form-group">
@@ -346,7 +396,7 @@
           <button type="button" class="preset-btn" onclick="applyPreset('thumb')">Mobile Thumb (320px)</button>
           <button type="button" class="preset-btn" onclick="applyPreset('noir')">Artistic Noir (B&amp;W)</button>
           <button type="button" class="preset-btn" onclick="applyPreset('blur')">Placeholder Blur</button>
-          <button type="button" class="preset-btn" onclick="applyPreset('reset')">Reset / Original</button>
+          <button type="button" class="preset-btn" onclick="applyPreset('reset')">Reset to Original</button>
         </div>
       </div>
 
@@ -376,17 +426,17 @@
 
       <!-- Dimensions -->
       <div class="form-group">
-        <div class="form-label"><span>Width (pixels)</span><span class="val" id="widthVal">Auto</span></div>
+        <div class="form-label"><span>Width</span><span class="val" id="widthVal">Auto</span></div>
         <input type="range" id="widthInput" min="0" max="1400" step="20" value="0" oninput="updateTransformation()">
       </div>
 
       <div class="form-group">
-        <div class="form-label"><span>Height (pixels)</span><span class="val" id="heightVal">Auto</span></div>
+        <div class="form-label"><span>Height</span><span class="val" id="heightVal">Auto</span></div>
         <input type="range" id="heightInput" min="0" max="1000" step="20" value="0" oninput="updateTransformation()">
       </div>
 
       <!-- Fit & Position -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 18px;">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
         <div>
           <label class="form-label"><span>Fit Mode</span></label>
           <select id="fitSelect" onchange="updateTransformation()">
@@ -410,13 +460,13 @@
 
       <!-- Quality -->
       <div class="form-group">
-        <div class="form-label"><span>Quality (Compression)</span><span class="val" id="qualityVal">85%</span></div>
+        <div class="form-label"><span>Quality (JPEG / WebP)</span><span class="val" id="qualityVal">85%</span></div>
         <input type="range" id="qualityInput" min="20" max="100" step="5" value="85" oninput="updateTransformation()">
       </div>
 
       <!-- Creative Filters -->
       <div class="form-group">
-        <label class="form-label"><span>Creative Filters &amp; Parity Modifiers</span></label>
+        <label class="form-label"><span>Filters &amp; Mirroring</span></label>
         <div class="checkbox-grid">
           <label class="checkbox-label">
             <input type="checkbox" id="grayscaleCheck" onchange="updateTransformation()"> Grayscale (B&amp;W)
@@ -437,10 +487,10 @@
       <div class="form-group">
         <label class="form-label"><span>Rotation</span></label>
         <div class="radio-group">
-          <label class="radio-label"><input type="radio" name="rotate" value="0" checked onchange="updateTransformation()"> 0&deg;</label>
-          <label class="radio-label"><input type="radio" name="rotate" value="90" onchange="updateTransformation()"> 90&deg;</label>
-          <label class="radio-label"><input type="radio" name="rotate" value="180" onchange="updateTransformation()"> 180&deg;</label>
-          <label class="radio-label"><input type="radio" name="rotate" value="270" onchange="updateTransformation()"> 270&deg;</label>
+          <label class="radio-label"><input type="radio" name="rotate" value="0" checked onchange="updateTransformation()"> 0 deg</label>
+          <label class="radio-label"><input type="radio" name="rotate" value="90" onchange="updateTransformation()"> 90 deg</label>
+          <label class="radio-label"><input type="radio" name="rotate" value="180" onchange="updateTransformation()"> 180 deg</label>
+          <label class="radio-label"><input type="radio" name="rotate" value="270" onchange="updateTransformation()"> 270 deg</label>
         </div>
       </div>
 
@@ -454,12 +504,12 @@
 
     <!-- Live Preview Panel -->
     <div class="panel">
-      <div class="panel-title">🖼️ Live Output &amp; Inspection</div>
+      <div class="panel-title">Live Output &amp; Inspection</div>
 
       <!-- Live Generated URL -->
       <div class="url-box">
         <div class="url-text" id="urlDisplay">/objects.tn/...</div>
-        <button type="button" class="copy-btn" id="copyBtn" onclick="copyUrl()">📋 Copy URL</button>
+        <button type="button" class="copy-btn" id="copyBtn" onclick="copyUrl()">Copy URL</button>
       </div>
 
       <!-- Image Preview -->
@@ -472,8 +522,8 @@
       <div class="metrics-bar">
         <div>Format: <strong id="metricFormat">WEBP</strong></div>
         <div>Mode: <strong id="metricMode">Cover</strong></div>
-        <div>Transformation: <strong id="metricTransform">Active</strong></div>
-        <div><a id="externalLink" href="#" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; font-weight: 600;">↗ Open Image in Tab</a></div>
+        <div>Status: <strong id="metricTransform">Active</strong></div>
+        <div><a id="externalLink" href="#" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none; font-weight: 600;">Open Image in Tab</a></div>
       </div>
     </div>
 
@@ -482,8 +532,8 @@
   <!-- Footer -->
   <footer>
     <p>ImagEngine &bull; Real-Time Image Optimization &amp; Delivery Platform</p>
-    <p style="margin-top: 8px;">
-      Developed with ❤️ by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; 
+    <p style="margin-top: 6px;">
+      Developed by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; 
       <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a> &bull; 
       <a href="https://topnepali.com/contact" target="_blank" rel="noopener">Contact / Request Whitelist</a>
     </p>
@@ -551,7 +601,6 @@
 
     function updateTransformation() {
       const { outUrl, format, fit, hasParams } = buildUrl();
-      const fullUrl = window.location.origin + outUrl;
 
       document.getElementById('urlDisplay').innerText = outUrl;
       document.getElementById('externalLink').href = outUrl;
@@ -566,7 +615,7 @@
         spinner.style.display = 'block';
         img.classList.add('loading');
         img.src = outUrl;
-      }, 200);
+      }, 150);
     }
 
     function onImgLoaded() {
@@ -584,7 +633,7 @@
       navigator.clipboard.writeText(url).then(() => {
         const btn = document.getElementById('copyBtn');
         const orig = btn.innerText;
-        btn.innerText = '✅ Copied!';
+        btn.innerText = 'Copied!';
         setTimeout(() => btn.innerText = orig, 1800);
       });
     }
@@ -629,7 +678,6 @@
       updateTransformation();
     }
 
-    // Initialize on page load
     window.addEventListener('DOMContentLoaded', () => {
       updateTransformation();
     });
