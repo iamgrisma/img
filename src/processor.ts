@@ -1,4 +1,4 @@
-import { PhotonImage, resize, crop, blur, sharpen, encodeJpeg, encodePng, encodeWebp } from '@cf-wasm/photon';
+import { PhotonImage, resize, crop, gaussian_blur, sharpen, SamplingFilter } from '@cf-wasm/photon';
 import { Resvg, initWasm } from '@resvg/resvg-wasm';
 import resvgWasm from '@resvg/resvg-wasm/index_bg.wasm';
 import {
@@ -7,7 +7,6 @@ import {
   RASTER_MAX_SIZE,
   FETCH_TIMEOUT_MS,
   DEFAULT_SVG_WIDTH,
-  RESIZE_FILTER_LANCZOS3,
 } from './constants';
 import { normalizeExt } from './routing';
 import type { TransformOptions } from './routing';
@@ -126,20 +125,36 @@ function planResize(srcW: number, srcH: number, tw: number, th: number, fit: str
   return { resizeW: tw, resizeH: th, cropX: 0, cropY: 0, cropW: tw, cropH: th, needsCrop: false };
 }
 
-function encodeImage(img: PhotonImage, ext: string, q: number) {
+function safeCrop(img: PhotonImage, x: number, y: number, w: number, h: number): PhotonImage {
+  const sw = img.get_width();
+  const sh = img.get_height();
+  const x1 = Math.max(0, Math.min(x, sw - 1));
+  const y1 = Math.max(0, Math.min(y, sh - 1));
+  const x2 = Math.min(sw, Math.max(x1 + 1, x1 + w));
+  const y2 = Math.min(sh, Math.max(y1 + 1, y1 + h));
+  return crop(img, x1, y1, x2, y2);
+}
+
+function encodeImage(
+  img: PhotonImage,
+  ext: string,
+  q: number
+): { buffer: Uint8Array; type: string; actualExt: string } {
   switch (ext) {
     case 'jpg':
-      return { buffer: encodeJpeg(img, q), type: MIME.jpg, actualExt: 'jpg' };
+    case 'jpeg':
+      return { buffer: img.get_bytes_jpeg(q), type: MIME.jpg, actualExt: 'jpg' };
     case 'webp':
-      return { buffer: encodeWebp(img, q), type: MIME.webp, actualExt: 'webp' };
+      return { buffer: img.get_bytes_webp(), type: MIME.webp, actualExt: 'webp' };
     case 'png':
-      return { buffer: encodePng(img), type: MIME.png, actualExt: 'png' };
+      return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
     case 'avif':
-      return { buffer: encodeWebp(img, q), type: MIME.webp, actualExt: 'webp' };
+      // Fallback to webp as Photon wasm does not have AVIF encoder
+      return { buffer: img.get_bytes_webp(), type: MIME.webp, actualExt: 'webp' };
     case 'gif':
-      return { buffer: encodePng(img), type: MIME.png, actualExt: 'png' };
+      return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
     default:
-      return { buffer: encodePng(img), type: MIME.png, actualExt: 'png' };
+      return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
   }
 }
 
@@ -186,27 +201,29 @@ async function transformRaster(
   ext: string,
   engine: string
 ): Promise<TransformResult> {
-  let image = new PhotonImage(input);
+  let image = PhotonImage.new_from_byteslice(input);
   const toFree: PhotonImage[] = [];
-  let sw = image.getWidth();
-  let sh = image.getHeight();
+  let sw = image.get_width();
+  let sh = image.get_height();
+
   if (opts.cropWidth || opts.cropHeight) {
     const cw = opts.cropWidth ? Math.min(opts.cropWidth, sw) : sw;
     const ch = opts.cropHeight ? Math.min(opts.cropHeight, sh) : sh;
     const old = image;
-    image = crop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
+    image = safeCrop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
     toFree.push(old);
-    sw = image.getWidth();
-    sh = image.getHeight();
+    sw = image.get_width();
+    sh = image.get_height();
   }
+
   if (opts.width && opts.height) {
     const p = planResize(sw, sh, opts.width, opts.height, opts.fit, opts.position);
     const old = image;
-    image = resize(image, p.resizeW, p.resizeH, RESIZE_FILTER_LANCZOS3);
+    image = resize(image, p.resizeW, p.resizeH, SamplingFilter.Lanczos3);
     toFree.push(old);
     if (p.needsCrop) {
       const o2 = image;
-      image = crop(image, p.cropX, p.cropY, p.cropW, p.cropH);
+      image = safeCrop(image, p.cropX, p.cropY, p.cropW, p.cropH);
       toFree.push(o2);
     }
   } else if (opts.width || opts.height) {
@@ -220,19 +237,19 @@ async function transformRaster(
       rw = Math.max(1, Math.round(sw * (opts.height! / sh)));
     }
     const old = image;
-    image = resize(image, rw, rh, RESIZE_FILTER_LANCZOS3);
+    image = resize(image, rw, rh, SamplingFilter.Lanczos3);
     toFree.push(old);
   }
+
   if (query.blur) {
-    const old = image;
-    image = blur(image, Math.min(Math.max(parseFloat(query.blur), 0.3), 1000));
-    toFree.push(old);
+    const radius = Math.min(Math.max(parseFloat(query.blur), 1), 100);
+    gaussian_blur(image, Math.round(radius));
   }
+
   if (query.sharpen === 'true' || query.sharpen === '1') {
-    const old = image;
-    image = sharpen(image);
-    toFree.push(old);
+    sharpen(image);
   }
+
   const enc = encodeImage(image, ext, opts.quality);
   for (const i of toFree) {
     try {

@@ -26,11 +26,26 @@ export function resolveUpstream(cleanPath: string, query: Record<string, string>
   if (!tenantDomain) return null;
   const originHost = hostParts.length ? `${hostParts.join('.')}.${tenantDomain}` : tenantDomain;
   const asset = parts.slice(1).join('/');
-  const match =
+  let match =
     asset.match(/^(.*)-(jpe?g|png|webp|gif|svg|avif)\.([a-z0-9]+)$/i) ||
     asset.match(/^(.*)\.(jpe?g|png|webp|gif|svg|avif)\.([a-z0-9]+)$/i);
-  if (!match) return null;
-  const [, basePath, originalExt, targetExt] = match;
+
+  let basePath = '';
+  let originalExt = '';
+  let targetExt = '';
+
+  if (match) {
+    [, basePath, originalExt, targetExt] = match;
+  } else {
+    const singleMatch = asset.match(/^(.*)\.(jpe?g|png|webp|gif|svg|avif)$/i);
+    if (singleMatch) {
+      [, basePath, originalExt] = singleMatch;
+      targetExt = query.format || originalExt;
+    } else {
+      return null;
+    }
+  }
+
   const params = new URLSearchParams();
   for (const [key, value] of Object.entries(query)) {
     if (!ENGINE_KEYS.has(key)) params.set(key, value);

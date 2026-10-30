@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ImagEngine - Edge Image Processing</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; line-height: 1.6; color: #333; }
+    h1 { color: #0284c7; }
+    code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; }
+    pre { background: #0f172a; color: #f8fafc; padding: 16px; border-radius: 8px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>ImagEngine</h1>
+  <p>High-performance edge image optimization and transformation proxy running on Cloudflare Pages Functions.</p>
+  <h2>API Endpoints</h2>
+  <ul>
+    <li><code>/health</code> - Health status check</li>
+    <li><code>/[tenant]/path/to/image.jpg</code> - Image proxy</li>
+    <li><code>/[tenant]/path/to/image.jpg?w=600&format=webp</code> - Resize & convert</li>
+    <li><code>/[tenant]/path/to/image-jpg.webp</code> - Slug-based format conversion</li>
+  </ul>
+</body>
+</html>

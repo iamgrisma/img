@@ -28,4 +28,4 @@ export const RASTER_MAX_SIZE = 25_000_000;
 export const FETCH_TIMEOUT_MS = 5_000;
 export const DEFAULT_SVG_WIDTH = 1200;
 export const DEFAULT_QUALITY = 85;
-export const RESIZE_FILTER_LANCZOS3 = 4;
+export const RESIZE_FILTER_LANCZOS3 = 5;
