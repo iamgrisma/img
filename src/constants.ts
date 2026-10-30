@@ -24,7 +24,7 @@ export const MIME: Record<string, string> = {
 
 export const CACHE_HEADER = 'public, max-age=31536000, s-maxage=31536000, immutable';
 export const CDN_CACHE_HEADER = 'public, max-age=31536000, immutable';
-export const SVG_MAX_SIZE = 6_000_000;
+export const SVG_MAX_SIZE = 2_000_000;
 export const RASTER_MAX_SIZE = 25_000_000;
 export const FETCH_TIMEOUT_MS = 5_000;
 export const DEFAULT_SVG_WIDTH = 1200;
