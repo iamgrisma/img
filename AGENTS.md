@@ -82,6 +82,12 @@ All agents and contributors must strictly adhere to the following rules:
 - Calling `new Resvg()` without custom font buffers causes all `<text>` nodes in SVG assets to render completely blank or invisible.
 - Always provide `fontBuffers` from `getCoreFontBuffers()` (`src/fonts/embedded-fonts.ts`) to `Resvg`. This guarantees that Latin/English text (`Plus Jakarta Sans`, `Inter`) and Devanagari/Nepali text (`Kalimati`) render accurately with 100% glyph fidelity on every edge worker across all tenants (e.g. `fontsdir` / `fonts.tn`).
 
+### Invariant 9: Zero-Worker Static Asset Delivery & Canonical Domains
+- Canonical production host is `https://img.topnepali.com` (with `https://imagengine.pages.dev` as the default Cloudflare Pages staging/test host).
+- All non-image transformation routes (`/`, `/index.html`, `/try-yourself`, `/try-yourself.html`, `/favicon.ico`, `/logo.svg`, `/og.svg`, `/og.webp`) must remain explicitly excluded in `public/_routes.json`.
+- Cloudflare Pages serves these static assets directly from the global CDN edge cache with 0 ms Worker CPU time and 0 billable worker invocations.
+- Converted dynamic images (e.g. `/fonts.tn/og-svg.webp`) return `Cache-Control: public, max-age=31536000, immutable`, meaning after the first initial transform, all subsequent requests hit Cloudflare Edge Cache (`CF-Cache-Status: HIT`) with 0 worker invocations.
+
 ---
 
 ## 3. Development and Verification Workflow

@@ -39,7 +39,7 @@ ImagEngine resolves upstream origins dynamically using configured tenant prefixe
 ```
 Example:
 ```
-https://imagengine.pages.dev/objects.tn/wp-content/uploads/2026/10/banner-jpg.webp?w=600&q=85
+https://img.topnepali.com/objects.tn/wp-content/uploads/2026/10/banner-jpg.webp?w=600&q=85
 ```
 
 #### 2. Query Parameter Format Conversion
@@ -48,7 +48,7 @@ https://imagengine.pages.dev/objects.tn/wp-content/uploads/2026/10/banner-jpg.we
 ```
 Example:
 ```
-https://imagengine.pages.dev/objects.tn/wp-content/uploads/2026/10/banner.jpg?format=webp&w=600
+https://img.topnepali.com/objects.tn/wp-content/uploads/2026/10/banner.jpg?format=webp&w=600
 ```
 
 ---
