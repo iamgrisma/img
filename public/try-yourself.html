@@ -3,22 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Transformation Playground - ImagEngine</title>
+  <title>Playground - ImagEngine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: #111827;
-      --card-border: #1f2937;
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
+      --bg: #090d16;
+      --card: #0f172a;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
       --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      --accent-green: #34d399;
-      --code-bg: #030712;
-      --code-border: #1e293b;
+      --green: #34d399;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -30,10 +27,9 @@
       width: 100%;
       max-width: 100%;
       overflow-x: hidden;
-      position: relative;
       background: var(--bg);
-      color: var(--text-main);
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
       line-height: 1.4;
       -webkit-font-smoothing: antialiased;
     }
@@ -41,89 +37,44 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 1200px;
-      width: 100%;
+      max-width: 820px;
       margin: 0 auto;
       padding: 12px 16px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      flex-wrap: wrap;
-      gap: 8px;
+      border-bottom: 1px solid var(--border);
     }
     .logo {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 800;
       color: #fff;
       text-decoration: none;
-      letter-spacing: -0.02em;
     }
-    .logo span {
-      color: var(--accent);
-    }
+    .logo span { color: var(--accent); }
     .nav-links {
       display: flex;
-      align-items: center;
-      gap: 12px;
+      gap: 14px;
       list-style: none;
-      flex-wrap: wrap;
     }
     .nav-links a {
-      color: var(--text-muted);
+      color: var(--muted);
       text-decoration: none;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       font-weight: 500;
-      transition: color 0.2s;
-      padding: 4px 6px;
     }
-    .nav-links a:hover, .nav-links a.active {
-      color: #fff;
-    }
-    .nav-btn {
-      background: #0284c7;
-      color: #fff !important;
-      padding: 5px 12px !important;
-      border-radius: 6px;
-      font-weight: 600 !important;
-    }
-    .container {
-      max-width: 1100px;
-      width: 100%;
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .nav-btn { color: var(--accent) !important; font-weight: 600 !important; }
+
+    main {
+      max-width: 820px;
       margin: 0 auto;
-      padding: 12px 16px 40px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      padding: 12px 16px;
     }
-    @media (min-width: 900px) {
-      .container {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 480px;
-        gap: 24px;
-        align-items: start;
-        padding-top: 20px;
-      }
-    }
-    /* Preview Card (Top on Mobile) */
-    .preview-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 14px;
-      width: 100%;
-      overflow: hidden;
-      order: 1; /* Always on top in mobile */
-    }
-    @media (min-width: 900px) {
-      .preview-card {
-        order: 2; /* Side by side on desktop */
-        position: sticky;
-        top: 16px;
-      }
-    }
-    .preview-stage {
+
+    /* Stage: Compact on mobile so parameters stay visible without scroll */
+    .stage {
       background: #030712;
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--border);
       border-radius: 8px;
-      height: 250px;
+      height: 220px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -131,501 +82,254 @@
       overflow: hidden;
       padding: 8px;
     }
-    @media (min-width: 900px) {
-      .preview-stage {
-        height: 380px;
-      }
+    @media (min-width: 768px) {
+      .stage { height: 340px; }
     }
     .preview-img {
       max-width: 100%;
       max-height: 100%;
-      border-radius: 6px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-      transition: opacity 0.2s;
+      border-radius: 4px;
       object-fit: contain;
-      display: block;
+      transition: opacity 0.15s;
     }
-    .preview-img.loading {
-      opacity: 0.35;
-    }
+    .preview-img.loading { opacity: 0.3; }
     .spinner {
       position: absolute;
-      width: 28px;
-      height: 28px;
-      border: 3px solid rgba(56, 189, 248, 0.2);
+      width: 22px;
+      height: 22px;
+      border: 2px solid rgba(56, 189, 248, 0.2);
       border-top-color: var(--accent);
       border-radius: 50%;
       animation: spin 0.8s linear infinite;
       display: none;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Ultra-Minimal Controls Card */
+    .controls-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .control-group label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+    }
+    .control-group select {
+      background: #090d16;
+      color: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px 8px;
+      font-size: 0.78rem;
+      font-family: inherit;
+      outline: none;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.15s;
+    }
+    .control-group select:focus {
+      border-color: var(--accent);
+    }
+
+    /* Effects Row (Checkboxes) */
+    .effects-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding-top: 6px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .cb-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.74rem;
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+    }
+    .cb-label input[type="checkbox"] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+    .cb-label:hover {
+      color: #fff;
+    }
+
+    /* URL Command Bar */
     .url-bar {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-      background: var(--code-bg);
-      border: 1px solid var(--code-border);
+      background: #030712;
+      border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 8px 10px;
-      margin-top: 10px;
-      width: 100%;
+      padding: 2px 4px 2px 8px;
+      gap: 6px;
     }
-    .url-text {
+    .url-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #7dd3fc;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.76rem;
-      color: #7dd3fc;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-      line-height: 1.35;
-      flex: 1 1 120px;
+      outline: none;
+      padding: 6px 0;
     }
-    .copy-btn {
+    .url-bar button {
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
-      color: #38bdf8;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.76rem;
+      color: var(--accent);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.72rem;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
-      flex-shrink: 0;
-      transition: background 0.15s;
+      transition: all 0.15s;
     }
-    .copy-btn:hover {
+    .url-bar button:hover {
       background: var(--accent);
       color: #0b0f19;
     }
-    .meta-bar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+
+    .hint {
       margin-top: 8px;
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-    .meta-bar strong {
-      color: #f1f5f9;
-    }
-    .meta-bar a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    /* Controls Card (Below Image on Mobile) */
-    .controls-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 14px;
-      width: 100%;
-      overflow: hidden;
-      order: 2; /* Below image on mobile */
-    }
-    @media (min-width: 900px) {
-      .controls-card {
-        order: 1;
-      }
-    }
-    .control-row {
-      margin-bottom: 12px;
-      width: 100%;
-    }
-    .control-row:last-child {
-      margin-bottom: 0;
-    }
-    .row-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 0.76rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      color: #94a3b8;
-      margin-bottom: 5px;
-    }
-    .row-header .current-val {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 600;
-      text-transform: none;
-    }
-    .chip-group {
-      display: flex;
-      gap: 5px;
-      flex-wrap: wrap;
-      width: 100%;
-    }
-    .chip-btn {
-      background: var(--code-bg);
-      border: 1px solid var(--code-border);
-      color: #cbd5e1;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-      flex: 1 1 auto;
+      font-size: 0.72rem;
+      color: #64748b;
       text-align: center;
     }
-    .chip-btn:hover {
-      border-color: rgba(56, 189, 248, 0.4);
-      color: #fff;
-    }
-    .chip-btn.active {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: var(--accent);
-      color: #fff;
-    }
-    .chip-toggle {
-      background: var(--code-bg);
-      border: 1px solid var(--code-border);
-      color: #cbd5e1;
-      padding: 6px 10px;
-      border-radius: 6px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      white-space: nowrap;
-      flex: 1 1 auto;
-      text-align: center;
-    }
-    .chip-toggle:hover {
-      border-color: rgba(56, 189, 248, 0.4);
-    }
-    .chip-toggle.active {
-      background: rgba(52, 211, 153, 0.18);
-      border-color: var(--accent-green);
-      color: #34d399;
-    }
-    .presets-bar {
-      display: flex;
-      gap: 5px;
-      overflow-x: auto;
-      padding-bottom: 4px;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      width: 100%;
-    }
-    .presets-bar::-webkit-scrollbar { display: none; }
-    .preset-chip {
-      background: rgba(56, 189, 248, 0.08);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      color: #e0f2fe;
-      padding: 5px 10px;
-      border-radius: 5px;
-      font-size: 0.74rem;
-      font-weight: 600;
-      cursor: pointer;
-      white-space: nowrap;
-      flex-shrink: 0;
-      transition: all 0.15s;
-    }
-    .preset-chip:hover {
-      background: rgba(56, 189, 248, 0.2);
-      border-color: var(--accent);
-    }
+
     footer {
       text-align: center;
-      padding: 24px 16px;
-      border-top: 1px solid var(--card-border);
+      padding: 16px;
+      border-top: 1px solid var(--border);
       color: #64748b;
-      font-size: 0.82rem;
-      width: 100%;
+      font-size: 0.78rem;
+      margin-top: 16px;
     }
-    footer a {
-      color: var(--accent);
-      text-decoration: none;
-      font-weight: 600;
-    }
-    footer a:hover {
-      text-decoration: underline;
-    }
+    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
   <nav>
     <a href="/" class="logo">Imag<span>Engine</span></a>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
       <li><a href="/try-yourself.html" class="active">Playground</a></li>
       <li><a href="https://topnepali.com" target="_blank" rel="noopener">Blog</a></li>
-      <li><a href="https://topnepali.com/contact" target="_blank" rel="noopener" class="nav-btn">Contact / Whitelist</a></li>
+      <li><a href="https://topnepali.com/contact" target="_blank" rel="noopener" class="nav-btn">Contact</a></li>
     </ul>
   </nav>
 
-  <div class="container">
+  <main>
 
-    <!-- Preview Stage (Top on Mobile) -->
-    <div class="preview-card">
-      <div class="preview-stage">
-        <div class="spinner" id="loadingSpinner"></div>
-        <img id="previewImg" class="preview-img" alt="Transformed Preview" src="" onload="onImgLoaded()" onerror="onImgError()">
-      </div>
-
-      <!-- Generated URL Bar -->
-      <div class="url-bar">
-        <div class="url-text" id="urlDisplay">/objects.tn/...</div>
-        <button type="button" class="copy-btn" id="copyBtn" onclick="copyUrl()">Copy URL</button>
-      </div>
-
-      <!-- Performance Meta -->
-      <div class="meta-bar">
-        <div>Format: <strong id="metricFormat">WEBP</strong></div>
-        <div>Mode: <strong id="metricFit">Cover</strong></div>
-        <div><a id="externalLink" href="#" target="_blank" rel="noopener">Open Full Image &rarr;</a></div>
-      </div>
+    <!-- Stage (Always Top in Mobile Viewport) -->
+    <div class="stage">
+      <div class="spinner" id="loadingSpinner"></div>
+      <img id="previewImg" class="preview-img" alt="Transformed Preview" src="" onload="onLoaded()" onerror="onError()">
     </div>
 
-    <!-- Compact Parameters Toolbar (Below Image on Mobile) -->
+    <!-- Minimal Controls (Below Image) -->
     <div class="controls-card">
 
-      <!-- Presets Scrollbar -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Quick Presets</span>
+      <div class="controls-grid">
+        <div class="control-group">
+          <label for="presetSelect">Preset</label>
+          <select id="presetSelect" onchange="onPresetChange(this.value)">
+            <option value="original">Original</option>
+            <option value="social">Social Card (1200x630)</option>
+            <option value="avatar">Avatar (256x256)</option>
+            <option value="mobile">Mobile (320px)</option>
+            <option value="noir">Noir (B&amp;W)</option>
+            <option value="blur">Blur Placeholder</option>
+            <option value="custom" disabled>Custom</option>
+          </select>
         </div>
-        <div class="presets-bar">
-          <button type="button" class="preset-chip" onclick="applyPreset('reset')">Reset</button>
-          <button type="button" class="preset-chip" onclick="applyPreset('og')">Social OG (1200x630)</button>
-          <button type="button" class="preset-chip" onclick="applyPreset('avatar')">Square Avatar (Top)</button>
-          <button type="button" class="preset-chip" onclick="applyPreset('thumb')">Mobile Thumb (320px)</button>
-          <button type="button" class="preset-chip" onclick="applyPreset('noir')">Noir B&amp;W</button>
-          <button type="button" class="preset-chip" onclick="applyPreset('blur')">Placeholder Blur</button>
+
+        <div class="control-group">
+          <label for="formatSelect">Format</label>
+          <select id="formatSelect" onchange="onFormatChange(this.value)">
+            <option value="webp">WebP</option>
+            <option value="png">PNG</option>
+            <option value="jpg">JPEG</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="rotateSelect">Rotation</label>
+          <select id="rotateSelect" onchange="onRotateChange(this.value)">
+            <option value="0">0 deg</option>
+            <option value="90">90 deg</option>
+            <option value="180">180 deg</option>
+            <option value="270">270 deg</option>
+          </select>
         </div>
       </div>
 
-      <!-- Format Selection -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Target Format</span>
-          <span class="current-val" id="formatVal">WebP</span>
-        </div>
-        <div class="chip-group" id="formatGroup">
-          <button type="button" class="chip-btn active" data-val="webp" onclick="setChip('format', 'webp')">WebP</button>
-          <button type="button" class="chip-btn" data-val="png" onclick="setChip('format', 'png')">PNG</button>
-          <button type="button" class="chip-btn" data-val="jpg" onclick="setChip('format', 'jpg')">JPEG</button>
-        </div>
+      <div class="effects-row">
+        <label class="cb-label">
+          <input type="checkbox" id="cbGray" onchange="onToggleEffect('grayscale', this.checked)"> Grayscale
+        </label>
+        <label class="cb-label">
+          <input type="checkbox" id="cbSharp" onchange="onToggleEffect('sharpen', this.checked)"> Sharpen
+        </label>
+        <label class="cb-label">
+          <input type="checkbox" id="cbFlipH" onchange="onToggleEffect('flip', this.checked)"> Flip H
+        </label>
+        <label class="cb-label">
+          <input type="checkbox" id="cbFlipV" onchange="onToggleEffect('flop', this.checked)"> Flip V
+        </label>
       </div>
 
-      <!-- Width Quick Chips -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Width</span>
-          <span class="current-val" id="widthVal">Auto</span>
-        </div>
-        <div class="chip-group" id="widthGroup">
-          <button type="button" class="chip-btn active" data-val="0" onclick="setChip('width', '0')">Auto</button>
-          <button type="button" class="chip-btn" data-val="320" onclick="setChip('width', '320')">320px</button>
-          <button type="button" class="chip-btn" data-val="600" onclick="setChip('width', '600')">600px</button>
-          <button type="button" class="chip-btn" data-val="800" onclick="setChip('width', '800')">800px</button>
-          <button type="button" class="chip-btn" data-val="1200" onclick="setChip('width', '1200')">1200px</button>
-        </div>
-      </div>
-
-      <!-- Height Quick Chips -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Height</span>
-          <span class="current-val" id="heightVal">Auto</span>
-        </div>
-        <div class="chip-group" id="heightGroup">
-          <button type="button" class="chip-btn active" data-val="0" onclick="setChip('height', '0')">Auto</button>
-          <button type="button" class="chip-btn" data-val="256" onclick="setChip('height', '256')">256px</button>
-          <button type="button" class="chip-btn" data-val="450" onclick="setChip('height', '450')">450px</button>
-          <button type="button" class="chip-btn" data-val="600" onclick="setChip('height', '600')">600px</button>
-          <button type="button" class="chip-btn" data-val="630" onclick="setChip('height', '630')">630px</button>
-        </div>
-      </div>
-
-      <!-- Fit & Anchor -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Fit Mode &amp; Anchor</span>
-          <span class="current-val" id="fitVal">Cover / Center</span>
-        </div>
-        <div class="chip-group" id="fitGroup" style="margin-bottom: 5px;">
-          <button type="button" class="chip-btn active" data-val="cover" onclick="setChip('fit', 'cover')">Cover</button>
-          <button type="button" class="chip-btn" data-val="contain" onclick="setChip('fit', 'contain')">Contain</button>
-          <button type="button" class="chip-btn" data-val="fill" onclick="setChip('fit', 'fill')">Fill</button>
-          <button type="button" class="chip-btn" data-val="inside" onclick="setChip('fit', 'inside')">Inside</button>
-        </div>
-        <div class="chip-group" id="posGroup">
-          <button type="button" class="chip-btn active" data-val="center" onclick="setChip('pos', 'center')">Center</button>
-          <button type="button" class="chip-btn" data-val="top" onclick="setChip('pos', 'top')">Top (Faces)</button>
-          <button type="button" class="chip-btn" data-val="bottom" onclick="setChip('pos', 'bottom')">Bottom</button>
-        </div>
-      </div>
-
-      <!-- Rotation (Loss-free) -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Rotation (Exact Color)</span>
-          <span class="current-val" id="rotateVal">0 deg</span>
-        </div>
-        <div class="chip-group" id="rotateGroup">
-          <button type="button" class="chip-btn active" data-val="0" onclick="setChip('rotate', '0')">0 deg</button>
-          <button type="button" class="chip-btn" data-val="90" onclick="setChip('rotate', '90')">90 deg</button>
-          <button type="button" class="chip-btn" data-val="180" onclick="setChip('rotate', '180')">180 deg</button>
-          <button type="button" class="chip-btn" data-val="270" onclick="setChip('rotate', '270')">270 deg</button>
-        </div>
-      </div>
-
-      <!-- Creative Toggles -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Creative Filters</span>
-        </div>
-        <div class="chip-group">
-          <button type="button" class="chip-toggle" id="toggleGrayscale" onclick="toggleFilter('grayscale')">Grayscale</button>
-          <button type="button" class="chip-toggle" id="toggleSharpen" onclick="toggleFilter('sharpen')">Sharpen</button>
-          <button type="button" class="chip-toggle" id="toggleFliph" onclick="toggleFilter('fliph')">Flip H</button>
-          <button type="button" class="chip-toggle" id="toggleFlipv" onclick="toggleFilter('flipv')">Flip V</button>
-        </div>
-      </div>
-
-      <!-- Quality & Blur -->
-      <div class="control-row">
-        <div class="row-header">
-          <span>Quality &amp; Blur</span>
-        </div>
-        <div class="chip-group" id="qualityGroup" style="margin-bottom: 5px;">
-          <button type="button" class="chip-btn" data-val="60" onclick="setChip('quality', '60')">q: 60%</button>
-          <button type="button" class="chip-btn" data-val="75" onclick="setChip('quality', '75')">q: 75%</button>
-          <button type="button" class="chip-btn active" data-val="85" onclick="setChip('quality', '85')">q: 85%</button>
-          <button type="button" class="chip-btn" data-val="95" onclick="setChip('quality', '95')">q: 95%</button>
-        </div>
-        <div class="chip-group" id="blurGroup">
-          <button type="button" class="chip-btn active" data-val="0" onclick="setChip('blur', '0')">Blur: Off</button>
-          <button type="button" class="chip-btn" data-val="4" onclick="setChip('blur', '4')">Blur: 4px</button>
-          <button type="button" class="chip-btn" data-val="8" onclick="setChip('blur', '8')">Blur: 8px</button>
-          <button type="button" class="chip-btn" data-val="16" onclick="setChip('blur', '16')">Blur: 16px</button>
-        </div>
+      <div class="url-bar">
+        <input type="text" id="urlInput" spellcheck="false" onkeydown="if(event.key==='Enter') onManualUrl()" onblur="onManualUrl()">
+        <button type="button" id="copyBtn" onclick="copyUrl()">Copy URL</button>
       </div>
 
     </div>
 
-  </div>
+    <p class="hint">Adjust controls or edit query parameters directly in the URL bar.</p>
 
-  <!-- Footer -->
+  </main>
+
   <footer>
-    <p>ImagEngine &bull; Real-Time Image Optimization Platform</p>
-    <p style="margin-top: 4px;">
-      Developed by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; 
-      <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a> &bull; 
-      <a href="https://topnepali.com/contact" target="_blank" rel="noopener">Contact / Request Whitelist</a>
-    </p>
+    ImagEngine &bull; Real-Time Image Optimization &bull; Developed by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a>
   </footer>
 
   <script>
-    // State
-    const state = {
-      source: 'objects.tn/wp-content/uploads/2026/10/nepal-army-rank-hierarchy-insignia-banner.webp',
-      format: 'webp',
-      width: '0',
-      height: '0',
-      fit: 'cover',
-      pos: 'center',
-      rotate: '0',
-      quality: '85',
-      blur: '0',
-      grayscale: false,
-      sharpen: false,
-      fliph: false,
-      flipv: false
-    };
-
+    const BASE_PATH = 'objects.tn/wp-content/uploads/2026/10/nepal-army-rank-hierarchy-insignia-banner.webp';
+    let currentUrl = '/' + BASE_PATH;
     let debounceTimer = null;
 
-    function setChip(group, val) {
-      state[group] = val;
-      updateActiveChips(group, val);
-      updatePreview();
-    }
-
-    function toggleFilter(filter) {
-      state[filter] = !state[filter];
-      const id = 'toggle' + filter.charAt(0).toUpperCase() + filter.slice(1);
-      const el = document.getElementById(id);
-      if (el) {
-        if (state[filter]) el.classList.add('active');
-        else el.classList.remove('active');
-      }
-      updatePreview();
-    }
-
-    function updateActiveChips(group, val) {
-      const containerId = group + 'Group';
-      const container = document.getElementById(containerId);
-      if (container) {
-        container.querySelectorAll('.chip-btn').forEach(btn => {
-          if (btn.getAttribute('data-val') === val) btn.classList.add('active');
-          else btn.classList.remove('active');
-        });
-      }
-      // Update label displays
-      if (group === 'format') document.getElementById('formatVal').innerText = val.toUpperCase();
-      if (group === 'width') document.getElementById('widthVal').innerText = val === '0' ? 'Auto' : val + 'px';
-      if (group === 'height') document.getElementById('heightVal').innerText = val === '0' ? 'Auto' : val + 'px';
-      if (group === 'rotate') document.getElementById('rotateVal').innerText = val + ' deg';
-      if (group === 'fit' || group === 'pos') {
-        document.getElementById('fitVal').innerText = state.fit.charAt(0).toUpperCase() + state.fit.slice(1) + ' / ' + state.pos.charAt(0).toUpperCase() + state.pos.slice(1);
-      }
-    }
-
-    function buildUrl() {
-      const params = new URLSearchParams();
-      if (state.width !== '0') params.set('w', state.width);
-      if (state.height !== '0') params.set('h', state.height);
-      if (state.width !== '0' && state.height !== '0') {
-        if (state.fit !== 'cover') params.set('fit', state.fit);
-        if (state.pos !== 'center') params.set('position', state.pos);
-      }
-      if (state.quality !== '85') params.set('q', state.quality);
-      if (state.grayscale) params.set('grayscale', '1');
-      if (state.sharpen) params.set('sharpen', '1');
-      if (state.fliph) params.set('flip', 'h');
-      if (state.flipv) params.set('flop', '1');
-      if (state.rotate !== '0') params.set('rotate', state.rotate);
-      if (state.blur !== '0') params.set('blur', state.blur);
-
-      let cleanSource = state.source;
-      const lastSlash = cleanSource.lastIndexOf('/');
-      const dir = cleanSource.substring(0, lastSlash + 1);
-      const fileWithExt = cleanSource.substring(lastSlash + 1);
-      const dotIdx = fileWithExt.lastIndexOf('.');
-      const fileBase = dotIdx !== -1 ? fileWithExt.substring(0, dotIdx) : fileWithExt;
-      const origExt = dotIdx !== -1 ? fileWithExt.substring(dotIdx + 1) : 'webp';
-
-      let outUrl = '';
-      if (origExt === state.format) {
-        outUrl = `/${dir}${fileBase}.${state.format}`;
-      } else {
-        outUrl = `/${dir}${fileBase}-${origExt}.${state.format}`;
-      }
-
-      const qs = params.toString();
-      if (qs) outUrl += '?' + qs;
-
-      return { outUrl, format: state.format, fit: state.fit };
-    }
-
-    function updatePreview() {
-      const { outUrl, format, fit } = buildUrl();
-
-      document.getElementById('urlDisplay').innerText = outUrl;
-      document.getElementById('externalLink').href = outUrl;
-      document.getElementById('metricFormat').innerText = format.toUpperCase();
-      document.getElementById('metricFit').innerText = fit.toUpperCase();
+    function applyUrl(url) {
+      if (!url.startsWith('/')) url = '/' + url;
+      currentUrl = url;
+      document.getElementById('urlInput').value = url;
+      syncControlsFromUrl(url);
 
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
@@ -633,86 +337,136 @@
         const spinner = document.getElementById('loadingSpinner');
         spinner.style.display = 'block';
         img.classList.add('loading');
-        img.src = outUrl;
-      }, 150);
+        img.src = currentUrl;
+      }, 120);
     }
 
-    function onImgLoaded() {
+    function onManualUrl() {
+      const val = document.getElementById('urlInput').value.trim();
+      if (val && val !== currentUrl) {
+        applyUrl(val);
+      }
+    }
+
+    function onLoaded() {
       document.getElementById('loadingSpinner').style.display = 'none';
       document.getElementById('previewImg').classList.remove('loading');
     }
 
-    function onImgError() {
+    function onError() {
       document.getElementById('loadingSpinner').style.display = 'none';
       document.getElementById('previewImg').classList.remove('loading');
     }
 
     function copyUrl() {
-      const url = window.location.origin + document.getElementById('urlDisplay').innerText;
-      navigator.clipboard.writeText(url).then(() => {
+      const full = window.location.origin + currentUrl;
+      navigator.clipboard.writeText(full).then(() => {
         const btn = document.getElementById('copyBtn');
-        const orig = btn.innerText;
         btn.innerText = 'Copied!';
-        setTimeout(() => btn.innerText = orig, 1800);
+        setTimeout(() => btn.innerText = 'Copy URL', 1500);
       });
     }
 
-    function applyPreset(name) {
-      if (name === 'reset') {
-        state.format = 'webp';
-        state.width = '0';
-        state.height = '0';
-        state.fit = 'cover';
-        state.pos = 'center';
-        state.rotate = '0';
-        state.quality = '85';
-        state.blur = '0';
-        state.grayscale = false;
-        state.sharpen = false;
-        state.fliph = false;
-        state.flipv = false;
-      } else if (name === 'og') {
-        state.format = 'webp';
-        state.width = '1200';
-        state.height = '630';
-        state.fit = 'cover';
-        state.pos = 'center';
-      } else if (name === 'avatar') {
-        state.format = 'webp';
-        state.width = '256';
-        state.height = '256';
-        state.fit = 'cover';
-        state.pos = 'top';
-      } else if (name === 'thumb') {
-        state.format = 'webp';
-        state.width = '320';
-        state.height = '0';
-        state.quality = '75';
-      } else if (name === 'noir') {
-        state.grayscale = true;
-        state.sharpen = true;
-      } else if (name === 'blur') {
-        state.blur = '8';
+    function onPresetChange(val) {
+      if (val === 'original') {
+        applyUrl('/' + BASE_PATH);
+      } else if (val === 'social') {
+        applyUrl('/' + BASE_PATH + '?w=1200&h=630&fit=cover');
+      } else if (val === 'avatar') {
+        applyUrl('/' + BASE_PATH + '?w=256&h=256&fit=cover&position=top');
+      } else if (val === 'mobile') {
+        applyUrl('/' + BASE_PATH + '?w=320&q=70');
+      } else if (val === 'noir') {
+        applyUrl('/' + BASE_PATH + '?grayscale=1&sharpen=1');
+      } else if (val === 'blur') {
+        applyUrl('/' + BASE_PATH + '?w=400&blur=8');
       }
+    }
 
-      // Sync UI
-      ['format', 'width', 'height', 'fit', 'pos', 'rotate', 'quality', 'blur'].forEach(k => {
-        updateActiveChips(k, state[k]);
-      });
-      ['grayscale', 'sharpen', 'fliph', 'flipv'].forEach(f => {
-        const id = 'toggle' + f.charAt(0).toUpperCase() + f.slice(1);
-        const el = document.getElementById(id);
-        if (el) {
-          if (state[f]) el.classList.add('active');
-          else el.classList.remove('active');
-        }
-      });
+    function onFormatChange(fmt) {
+      const parsed = new URL(window.location.origin + currentUrl);
+      let path = parsed.pathname;
+      if (fmt === 'webp') {
+        path = path.replace(/-webp\.(png|jpg|jpeg)/, '.webp').replace(/\.(png|jpg|jpeg)$/, '.webp');
+      } else {
+        path = path.replace(/\.webp$/, '-webp.' + fmt).replace(/-webp\.(png|jpg|jpeg)$/, '-webp.' + fmt);
+      }
+      const qs = parsed.searchParams.toString();
+      applyUrl(path + (qs ? '?' + qs : ''));
+    }
 
-      updatePreview();
+    function onRotateChange(deg) {
+      const parsed = new URL(window.location.origin + currentUrl);
+      if (deg === '0') {
+        parsed.searchParams.delete('rotate');
+      } else {
+        parsed.searchParams.set('rotate', deg);
+      }
+      const qs = parsed.searchParams.toString();
+      applyUrl(parsed.pathname + (qs ? '?' + qs : ''));
+    }
+
+    function onToggleEffect(key, checked) {
+      const parsed = new URL(window.location.origin + currentUrl);
+      if (key === 'grayscale') {
+        if (checked) parsed.searchParams.set('grayscale', '1');
+        else parsed.searchParams.delete('grayscale');
+      } else if (key === 'sharpen') {
+        if (checked) parsed.searchParams.set('sharpen', '1');
+        else parsed.searchParams.delete('sharpen');
+      } else if (key === 'flip') {
+        if (checked) parsed.searchParams.set('flip', 'h');
+        else parsed.searchParams.delete('flip');
+      } else if (key === 'flop') {
+        if (checked) parsed.searchParams.set('flop', '1');
+        else parsed.searchParams.delete('flop');
+      }
+      const qs = parsed.searchParams.toString();
+      applyUrl(parsed.pathname + (qs ? '?' + qs : ''));
+    }
+
+    function syncControlsFromUrl(url) {
+      const parsed = new URL(window.location.origin + url);
+      const qs = parsed.searchParams;
+
+      // Format select
+      const formatSelect = document.getElementById('formatSelect');
+      if (parsed.pathname.includes('.png')) formatSelect.value = 'png';
+      else if (parsed.pathname.includes('.jpg') || parsed.pathname.includes('.jpeg')) formatSelect.value = 'jpg';
+      else formatSelect.value = 'webp';
+
+      // Rotate select
+      const rot = qs.get('rotate') || '0';
+      document.getElementById('rotateSelect').value = ['0', '90', '180', '270'].includes(rot) ? rot : '0';
+
+      // Checkboxes
+      document.getElementById('cbGray').checked = qs.get('grayscale') === '1';
+      document.getElementById('cbSharp').checked = qs.get('sharpen') === '1';
+      document.getElementById('cbFlipH').checked = qs.get('flip') === 'h';
+      document.getElementById('cbFlipV').checked = qs.get('flop') === '1';
+
+      // Preset select
+      const presetSelect = document.getElementById('presetSelect');
+      const search = parsed.search;
+      if (!search && formatSelect.value === 'webp') {
+        presetSelect.value = 'original';
+      } else if (search === '?w=1200&h=630&fit=cover') {
+        presetSelect.value = 'social';
+      } else if (search === '?w=256&h=256&fit=cover&position=top') {
+        presetSelect.value = 'avatar';
+      } else if (search === '?w=320&q=70') {
+        presetSelect.value = 'mobile';
+      } else if (search === '?grayscale=1&sharpen=1') {
+        presetSelect.value = 'noir';
+      } else if (search === '?w=400&blur=8') {
+        presetSelect.value = 'blur';
+      } else {
+        presetSelect.value = 'custom';
+      }
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      updatePreview();
+      applyUrl('/' + BASE_PATH);
     });
   </script>
 
