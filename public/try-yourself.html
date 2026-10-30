@@ -252,6 +252,40 @@
       color: #0b0f19;
     }
 
+    /* Crop Quick Demo Pills */
+    .crop-demos-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      padding: 6px 0 2px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .crop-demos-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--accent);
+      margin-right: 2px;
+    }
+    .btn-demo {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--code-border);
+      color: var(--text-muted);
+      padding: 4px 9px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-family: inherit;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-demo:hover {
+      background: rgba(56, 189, 248, 0.12);
+      border-color: var(--accent);
+      color: #fff;
+    }
+
     /* Parameters Container */
     .params-container {
       display: flex;
@@ -471,15 +505,38 @@
         <div class="param-card-header">
           <span class="param-card-title">1. Geometry, Resize &amp; Cropping</span>
           <select id="selPreset" class="preset-dropdown" onchange="onPresetSelect(this.value)">
-            <option value="">Load Preset...</option>
-            <option value="default">Default Sample (800x450 cover)</option>
-            <option value="original">Original Upstream (No resize)</option>
-            <option value="social">Social OG (1200x630 cover)</option>
-            <option value="avatar">Avatar (256x256 top)</option>
-            <option value="mobile">Mobile Thumbnail (320px q75)</option>
-            <option value="contain">Contain Fit (600x600)</option>
-            <option value="crop">Pre-Crop Focus (cw=600 ch=400)</option>
+            <option value="">Load Preset / Demo...</option>
+            <optgroup label="General Presets">
+              <option value="default">Default Sample (800x450 cover)</option>
+              <option value="original">Original Upstream (1200x630)</option>
+              <option value="social">Social OG (1200x630 cover)</option>
+              <option value="mobile">Mobile Thumbnail (320px q75)</option>
+              <option value="contain">Contain Fit (600x600)</option>
+            </optgroup>
+            <optgroup label="Crop Variations (cw &amp; ch)">
+              <option value="crop-vert">Center Vertical Crop (ch=300)</option>
+              <option value="crop-horiz">Center Horizontal Crop (cw=600)</option>
+              <option value="crop-both">Center Both Axes Crop (cw=600 &amp; ch=300)</option>
+              <option value="crop-scale">Pre-Crop + Resize (cw=800 ch=400 &rarr; w=400 h=200)</option>
+            </optgroup>
+            <optgroup label="Aspect Anchor Crops (position)">
+              <option value="crop-top">Top Anchor Square (w=500 h=500 pos=top)</option>
+              <option value="crop-center">Center Anchor Square (w=500 h=500 pos=center)</option>
+              <option value="crop-bottom">Bottom Anchor Square (w=500 h=500 pos=bottom)</option>
+              <option value="crop-left">Left Anchor Portrait (w=400 h=600 pos=left)</option>
+              <option value="crop-right">Right Anchor Portrait (w=400 h=600 pos=right)</option>
+            </optgroup>
           </select>
+        </div>
+
+        <!-- Quick Crop Demo Pills -->
+        <div class="crop-demos-bar">
+          <span class="crop-demos-label">Crop Demos:</span>
+          <button type="button" class="btn-demo" onclick="onPresetSelect('crop-vert')">Center Vertical (ch=300)</button>
+          <button type="button" class="btn-demo" onclick="onPresetSelect('crop-horiz')">Center Horizontal (cw=600)</button>
+          <button type="button" class="btn-demo" onclick="onPresetSelect('crop-both')">Center Both (cw=600 ch=300)</button>
+          <button type="button" class="btn-demo" onclick="onPresetSelect('crop-scale')">Crop + Scale (800x400 &rarr; 400x200)</button>
+          <button type="button" class="btn-demo" onclick="onPresetSelect('crop-top')">Top Face Anchor (pos=top)</button>
         </div>
 
         <div class="fields-grid fields-grid-4">
@@ -793,8 +850,24 @@
         applyUrl('/' + BASE_NAME + '.webp?w=320&q=75', true);
       } else if (name === 'contain') {
         applyUrl('/' + BASE_NAME + '.webp?w=600&h=600&fit=contain', true);
-      } else if (name === 'crop') {
-        applyUrl('/' + BASE_NAME + '.webp?cw=600&ch=400&w=600&h=400', true);
+      } else if (name === 'crop-vert') {
+        applyUrl('/' + BASE_NAME + '.webp?ch=300', true);
+      } else if (name === 'crop-horiz') {
+        applyUrl('/' + BASE_NAME + '.webp?cw=600', true);
+      } else if (name === 'crop-both') {
+        applyUrl('/' + BASE_NAME + '.webp?cw=600&ch=300', true);
+      } else if (name === 'crop-scale') {
+        applyUrl('/' + BASE_NAME + '.webp?cw=800&ch=400&w=400&h=200', true);
+      } else if (name === 'crop-top') {
+        applyUrl('/' + BASE_NAME + '.webp?w=500&h=500&fit=cover&position=top', true);
+      } else if (name === 'crop-center') {
+        applyUrl('/' + BASE_NAME + '.webp?w=500&h=500&fit=cover&position=center', true);
+      } else if (name === 'crop-bottom') {
+        applyUrl('/' + BASE_NAME + '.webp?w=500&h=500&fit=cover&position=bottom', true);
+      } else if (name === 'crop-left') {
+        applyUrl('/' + BASE_NAME + '.webp?w=400&h=600&fit=cover&position=left', true);
+      } else if (name === 'crop-right') {
+        applyUrl('/' + BASE_NAME + '.webp?w=400&h=600&fit=cover&position=right', true);
       }
       document.getElementById('selPreset').value = '';
     }

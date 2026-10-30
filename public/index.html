@@ -565,13 +565,26 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 5 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 05</span>
-      <h3 style="margin-top: 6px;">Crop Alignment (Position Anchoring)</h3>
-      <p>When cropping with fit=cover, control which part of the image is kept:</p>
+      <h3 style="margin-top: 6px;">Crop Alignment &amp; Coordinate Pre-Cropping</h3>
+      <p>When cropping with <code>fit=cover</code>, control which anchor is preserved:</p>
       <pre>?w=600&amp;h=600&amp;fit=cover&amp;position=center   # Default: center crop
-?w=600&amp;h=600&amp;fit=cover&amp;position=top      # Top anchor (perfect for portraits)
+?w=600&amp;h=600&amp;fit=cover&amp;position=top      # Top anchor (perfect for portraits &amp; faces)
 ?w=600&amp;h=600&amp;fit=cover&amp;position=bottom   # Bottom anchor
 ?w=600&amp;h=600&amp;fit=cover&amp;position=left     # Left anchor
 ?w=600&amp;h=600&amp;fit=cover&amp;position=right    # Right anchor</pre>
+
+      <p style="margin-top: 14px;"><strong>Coordinate Pre-Crop (<code>cw</code> &amp; <code>ch</code>):</strong> Extract centered coordinate windows before scaling:</p>
+      <pre># Center Vertical Crop (preserves full width, crops height centered):
+GET /object.gcom/banner.webp?ch=300
+
+# Center Horizontal Crop (preserves full height, crops width centered):
+GET /object.gcom/banner.webp?cw=600
+
+# Center Dual-Axis Crop (crops both width &amp; height centered):
+GET /object.gcom/banner.webp?cw=600&amp;ch=300
+
+# Pre-Crop + Target Output Resize:
+GET /object.gcom/banner.webp?cw=800&amp;ch=400&amp;w=400&amp;h=200</pre>
     </div>
 
     <!-- Scenario 6 -->
