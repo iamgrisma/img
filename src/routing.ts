@@ -126,12 +126,11 @@ export function getOptions(query: Record<string, string>, cleanPath: string): Tr
 
 export function needsTransform(query: Record<string, string>, opts: TransformOptions): boolean {
   return Boolean(
-    opts.width ||
-      opts.height ||
+    opts.hasExplicitW ||
+      opts.hasExplicitH ||
       opts.cropWidth ||
       opts.cropHeight ||
       opts.avatar ||
-      opts.isOg ||
       query.q ||
       query.quality ||
       query.blur ||

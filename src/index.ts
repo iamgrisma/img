@@ -119,7 +119,8 @@ app.all('*', async (c) => {
   const webpSource = source.type.includes('webp') || origExt === 'webp';
   const ifNoneMatch = c.req.header('If-None-Match');
 
-  if (!transformed && source.svg && requestedExt === 'svg') {
+  // SVG requested as SVG always takes direct edge passthrough (0 worker CPU)
+  if (source.svg && requestedExt === 'svg') {
     const body = new TextEncoder().encode(source.svg);
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);

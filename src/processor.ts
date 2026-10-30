@@ -56,30 +56,14 @@ function cleanSvg(svg: string): string {
   return svg
     .replace(/&[a-zA-Z0-9#]*…/g, '…')
     .replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, '&amp;')
-    // Strip computationally abusive large Gaussian blurs (stdDeviation > 10) that choke edge CPU
-    .replace(/<feGaussianBlur[^>]*stdDeviation=["']([0-9.]+)["'][^>]*\/?>/gi, (match, val) => {
-      const n = parseFloat(val);
-      if (n > 10) return '';
-      return match;
-    });
-}
-
-async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8Array> {
-  const fontBuffers = getCoreFontBuffers();
-  const resvg = new Resvg(cleanSvg(svgText), {
-    fitTo: { mode: 'width', value: targetWidth },
-    background: 'rgba(255,255,255,0)',
-    shapeRendering: 0,
-    textRendering: 0,
-    font: {
-      loadSystemFonts: false,
-      fontBuffers,
-      defaultFontFamily: 'Plus Jakarta Sans',
-      sansSerifFamily: 'Plus Jakarta Sans',
-      serifFamily: 'Kalimati',
-    },
-  });
-  return resvg.render().asPng();
+    // Strip external @import fonts to prevent CSS parser stalls
+    .replace(/@import\s+url\([^)]+\);?/gi, '')
+    // Strip computationally abusive filter effects (feGaussianBlur, etc.) and filter attributes
+    .replace(/<filter[\s\S]*?<\/filter>/gi, '')
+    .replace(/\bfilter=["'][^"']*["']/gi, '')
+    // Strip high-density repetitive tile patterns (like 40x40 dot grids that tile hundreds of vector paths)
+    .replace(/<pattern[\s\S]*?<\/pattern>/gi, '')
+    .replace(/<rect[^>]*fill=["']url\(#[^"']*(?:grid|pattern)[^"']*\)["'][^>]*\/?>/gi, '');
 }
 
 function cropOffset(d: number, t: number, p: string): number {
@@ -89,12 +73,12 @@ function cropOffset(d: number, t: number, p: string): number {
 }
 
 function getFilter(sw: number, sh: number, tw: number, th: number): SamplingFilter {
-  // Use Bilinear (Triangle) when upscaling or when target canvas exceeds 2.5 megapixels
-  // to prevent exceeding Cloudflare edge CPU time limits while maintaining high visual quality
-  if (tw > sw || th > sh || tw * th > 2_500_000) {
+  // Use Bilinear (Triangle) interpolation on edge workers to guarantee execution
+  // within Cloudflare's strict CPU time limits (Lanczos3 is 36-tap and chokes edge CPU)
+  if (tw > sw || th > sh || sw * sh > 100_000 || tw * th > 100_000) {
     return SamplingFilter.Triangle;
   }
-  return SamplingFilter.Lanczos3;
+  return SamplingFilter.Triangle;
 }
 
 function executeResize(
@@ -107,6 +91,11 @@ function executeResize(
 ): PhotonImage {
   const sw = img.get_width();
   const sh = img.get_height();
+
+  if (sw === tw && sh === th) {
+    return img;
+  }
+
   const sr = sw / sh;
   const tr = tw / th;
 
@@ -288,11 +277,59 @@ export async function transform(
       (e as any).status = 413;
       throw e;
     }
-    const png = await rasterizeSvg(source.svg, opts.width || DEFAULT_SVG_WIDTH);
-    const more = opts.height || opts.cropWidth || opts.cropHeight || query.blur || query.sharpen || ext !== 'png';
-    if (!more) return { buffer: png, type: MIME.png, engine: 'resvg-svg', actualExt: 'png' };
-    return transformRaster(png, query, opts, ext, 'resvg-svg');
+
+    const fontBuffers = getCoreFontBuffers();
+    const resvg = new Resvg(cleanSvg(source.svg), {
+      fitTo: { mode: 'width', value: opts.width || DEFAULT_SVG_WIDTH },
+      background: 'rgba(255,255,255,0)',
+      shapeRendering: 0,
+      textRendering: 0,
+      imageRendering: 1,
+      font: {
+        loadSystemFonts: false,
+        fontBuffers,
+        defaultFontFamily: 'Plus Jakarta Sans',
+        sansSerifFamily: 'Plus Jakarta Sans',
+        serifFamily: 'Kalimati',
+      },
+    });
+
+    const rendered = resvg.render();
+    const rw = rendered.width;
+    const rh = rendered.height;
+
+    // Fast-path: if PNG requested and no raster operations needed, return PNG directly
+    const needsRasterOps = Boolean(
+      (opts.height && opts.height !== rh) ||
+        opts.cropWidth ||
+        opts.cropHeight ||
+        query.blur ||
+        query.sharpen ||
+        query.rotate ||
+        query.flip ||
+        query.fliph ||
+        query.flop ||
+        query.flipv ||
+        query.grayscale ||
+        query.greyscale
+    );
+
+    if (ext === 'png' && !needsRasterOps) {
+      const png = rendered.asPng();
+      rendered.free();
+      resvg.free();
+      return { buffer: png, type: MIME.png, engine: 'resvg-svg', actualExt: 'png' };
+    }
+
+    // Zero-copy: wrap rendered RGBA pixels directly into PhotonImage
+    // Eliminates redundant PNG encode (Resvg) + PNG decode (Photon) saving ~100ms CPU
+    const image = new PhotonImage(new Uint8Array(rendered.pixels), rw, rh);
+    rendered.free();
+    resvg.free();
+
+    return processPhotonImage(image, query, opts, ext, 'resvg-svg');
   }
+
   if (!source.raster) {
     const e = new Error('No raster data');
     (e as any).status = 404;
@@ -303,17 +340,19 @@ export async function transform(
     (e as any).status = 413;
     throw e;
   }
-  return transformRaster(source.raster, query, opts, ext, 'photon-raster');
+
+  const image = PhotonImage.new_from_byteslice(source.raster);
+  return processPhotonImage(image, query, opts, ext, 'photon-raster');
 }
 
-async function transformRaster(
-  input: Uint8Array,
+function processPhotonImage(
+  initialImage: PhotonImage,
   query: Record<string, string>,
   opts: TransformOptions,
   ext: string,
   engine: string
-): Promise<TransformResult> {
-  let image = PhotonImage.new_from_byteslice(input);
+): TransformResult {
+  let image = initialImage;
   const toFree: PhotonImage[] = [];
   let sw = image.get_width();
   let sh = image.get_height();
@@ -329,11 +368,13 @@ async function transformRaster(
   if (opts.cropWidth || opts.cropHeight) {
     const cw = opts.cropWidth ? Math.min(opts.cropWidth, sw) : sw;
     const ch = opts.cropHeight ? Math.min(opts.cropHeight, sh) : sh;
-    const old = image;
-    image = safeCrop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
-    toFree.push(old);
-    sw = image.get_width();
-    sh = image.get_height();
+    if (cw !== sw || ch !== sh) {
+      const old = image;
+      image = safeCrop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
+      toFree.push(old);
+      sw = image.get_width();
+      sh = image.get_height();
+    }
   }
 
   // Upscale limit: Maximum 4x of image dimensions (clamped at MAX_DIMENSION)
@@ -345,7 +386,9 @@ async function transformRaster(
   const targetH = opts.height ? Math.min(opts.height, maxAllowedH) : null;
 
   if (targetW && targetH) {
-    image = executeResize(image, targetW, targetH, opts.fit, opts.position, toFree);
+    if (sw !== targetW || sh !== targetH) {
+      image = executeResize(image, targetW, targetH, opts.fit, opts.position, toFree);
+    }
   } else if (targetW || targetH) {
     let rw: number;
     let rh: number;
@@ -356,9 +399,11 @@ async function transformRaster(
       rh = targetH!;
       rw = Math.max(1, Math.round(sw * (targetH! / sh)));
     }
-    const old = image;
-    image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
-    toFree.push(old);
+    if (sw !== rw || sh !== rh) {
+      const old = image;
+      image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
+      toFree.push(old);
+    }
   }
 
   if (query.blur) {

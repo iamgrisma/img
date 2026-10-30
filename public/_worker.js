@@ -1981,7 +1981,7 @@ function getOptions(query, cleanPath) {
 __name(getOptions, "getOptions");
 function needsTransform(query, opts) {
   return Boolean(
-    opts.width || opts.height || opts.cropWidth || opts.cropHeight || opts.avatar || opts.isOg || query.q || query.quality || query.blur || query.sharpen || query.rotate || query.flip || query.fliph || query.flop || query.flipv || query.grayscale || query.greyscale
+    opts.hasExplicitW || opts.hasExplicitH || opts.cropWidth || opts.cropHeight || opts.avatar || query.q || query.quality || query.blur || query.sharpen || query.rotate || query.flip || query.fliph || query.flop || query.flipv || query.grayscale || query.greyscale
   );
 }
 __name(needsTransform, "needsTransform");
@@ -3604,31 +3604,9 @@ async function fetchSource(url) {
 }
 __name(fetchSource, "fetchSource");
 function cleanSvg(svg) {
-  return svg.replace(/&[a-zA-Z0-9#]*…/g, "\u2026").replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, "&amp;").replace(/<feGaussianBlur[^>]*stdDeviation=["']([0-9.]+)["'][^>]*\/?>/gi, (match3, val) => {
-    const n = parseFloat(val);
-    if (n > 10) return "";
-    return match3;
-  });
+  return svg.replace(/&[a-zA-Z0-9#]*…/g, "\u2026").replace(/&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[a-fA-F0-9]+);)/g, "&amp;").replace(/@import\s+url\([^)]+\);?/gi, "").replace(/<filter[\s\S]*?<\/filter>/gi, "").replace(/\bfilter=["'][^"']*["']/gi, "").replace(/<pattern[\s\S]*?<\/pattern>/gi, "").replace(/<rect[^>]*fill=["']url\(#[^"']*(?:grid|pattern)[^"']*\)["'][^>]*\/?>/gi, "");
 }
 __name(cleanSvg, "cleanSvg");
-async function rasterizeSvg(svgText, targetWidth) {
-  const fontBuffers = getCoreFontBuffers();
-  const resvg = new Resvg3(cleanSvg(svgText), {
-    fitTo: { mode: "width", value: targetWidth },
-    background: "rgba(255,255,255,0)",
-    shapeRendering: 0,
-    textRendering: 0,
-    font: {
-      loadSystemFonts: false,
-      fontBuffers,
-      defaultFontFamily: "Plus Jakarta Sans",
-      sansSerifFamily: "Plus Jakarta Sans",
-      serifFamily: "Kalimati"
-    }
-  });
-  return resvg.render().asPng();
-}
-__name(rasterizeSvg, "rasterizeSvg");
 function cropOffset(d, t, p) {
   if (p === "top" || p === "left") return 0;
   if (p === "bottom" || p === "right") return Math.max(0, d - t);
@@ -3636,15 +3614,18 @@ function cropOffset(d, t, p) {
 }
 __name(cropOffset, "cropOffset");
 function getFilter(sw, sh, tw, th) {
-  if (tw > sw || th > sh || tw * th > 25e5) {
+  if (tw > sw || th > sh || sw * sh > 1e5 || tw * th > 1e5) {
     return SamplingFilter.Triangle;
   }
-  return SamplingFilter.Lanczos3;
+  return SamplingFilter.Triangle;
 }
 __name(getFilter, "getFilter");
 function executeResize(img, tw, th, fit, pos, toFree) {
   const sw = img.get_width();
   const sh = img.get_height();
+  if (sw === tw && sh === th) {
+    return img;
+  }
   const sr = sw / sh;
   const tr = tw / th;
   if (fit === "fill") {
@@ -3801,10 +3782,37 @@ async function transform(source, query, opts, targetExt) {
       e.status = 413;
       throw e;
     }
-    const png = await rasterizeSvg(source.svg, opts.width || DEFAULT_SVG_WIDTH);
-    const more = opts.height || opts.cropWidth || opts.cropHeight || query.blur || query.sharpen || ext !== "png";
-    if (!more) return { buffer: png, type: MIME.png, engine: "resvg-svg", actualExt: "png" };
-    return transformRaster(png, query, opts, ext, "resvg-svg");
+    const fontBuffers = getCoreFontBuffers();
+    const resvg = new Resvg3(cleanSvg(source.svg), {
+      fitTo: { mode: "width", value: opts.width || DEFAULT_SVG_WIDTH },
+      background: "rgba(255,255,255,0)",
+      shapeRendering: 0,
+      textRendering: 0,
+      imageRendering: 1,
+      font: {
+        loadSystemFonts: false,
+        fontBuffers,
+        defaultFontFamily: "Plus Jakarta Sans",
+        sansSerifFamily: "Plus Jakarta Sans",
+        serifFamily: "Kalimati"
+      }
+    });
+    const rendered = resvg.render();
+    const rw = rendered.width;
+    const rh = rendered.height;
+    const needsRasterOps = Boolean(
+      opts.height && opts.height !== rh || opts.cropWidth || opts.cropHeight || query.blur || query.sharpen || query.rotate || query.flip || query.fliph || query.flop || query.flipv || query.grayscale || query.greyscale
+    );
+    if (ext === "png" && !needsRasterOps) {
+      const png = rendered.asPng();
+      rendered.free();
+      resvg.free();
+      return { buffer: png, type: MIME.png, engine: "resvg-svg", actualExt: "png" };
+    }
+    const image2 = new PhotonImage(new Uint8Array(rendered.pixels), rw, rh);
+    rendered.free();
+    resvg.free();
+    return processPhotonImage(image2, query, opts, ext, "resvg-svg");
   }
   if (!source.raster) {
     const e = new Error("No raster data");
@@ -3816,11 +3824,12 @@ async function transform(source, query, opts, targetExt) {
     e.status = 413;
     throw e;
   }
-  return transformRaster(source.raster, query, opts, ext, "photon-raster");
+  const image = PhotonImage.new_from_byteslice(source.raster);
+  return processPhotonImage(image, query, opts, ext, "photon-raster");
 }
 __name(transform, "transform");
-async function transformRaster(input, query, opts, ext, engine) {
-  let image = PhotonImage.new_from_byteslice(input);
+function processPhotonImage(initialImage, query, opts, ext, engine) {
+  let image = initialImage;
   const toFree = [];
   let sw = image.get_width();
   let sh = image.get_height();
@@ -3833,18 +3842,22 @@ async function transformRaster(input, query, opts, ext, engine) {
   if (opts.cropWidth || opts.cropHeight) {
     const cw = opts.cropWidth ? Math.min(opts.cropWidth, sw) : sw;
     const ch = opts.cropHeight ? Math.min(opts.cropHeight, sh) : sh;
-    const old = image;
-    image = safeCrop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
-    toFree.push(old);
-    sw = image.get_width();
-    sh = image.get_height();
+    if (cw !== sw || ch !== sh) {
+      const old = image;
+      image = safeCrop(image, Math.max(0, Math.floor((sw - cw) / 2)), Math.max(0, Math.floor((sh - ch) / 2)), cw, ch);
+      toFree.push(old);
+      sw = image.get_width();
+      sh = image.get_height();
+    }
   }
   const maxAllowedW = Math.min(sw * MAX_UPSCALE_FACTOR, MAX_DIMENSION);
   const maxAllowedH = Math.min(sh * MAX_UPSCALE_FACTOR, MAX_DIMENSION);
   const targetW = opts.width ? Math.min(opts.width, maxAllowedW) : null;
   const targetH = opts.height ? Math.min(opts.height, maxAllowedH) : null;
   if (targetW && targetH) {
-    image = executeResize(image, targetW, targetH, opts.fit, opts.position, toFree);
+    if (sw !== targetW || sh !== targetH) {
+      image = executeResize(image, targetW, targetH, opts.fit, opts.position, toFree);
+    }
   } else if (targetW || targetH) {
     let rw;
     let rh;
@@ -3855,9 +3868,11 @@ async function transformRaster(input, query, opts, ext, engine) {
       rh = targetH;
       rw = Math.max(1, Math.round(sw * (targetH / sh)));
     }
-    const old = image;
-    image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
-    toFree.push(old);
+    if (sw !== rw || sh !== rh) {
+      const old = image;
+      image = resize(image, rw, rh, getFilter(sw, sh, rw, rh));
+      toFree.push(old);
+    }
   }
   if (query.blur) {
     const radius = Math.min(Math.max(parseFloat(query.blur), 1), 100);
@@ -3896,7 +3911,7 @@ async function transformRaster(input, query, opts, ext, engine) {
   }
   return { buffer: enc.buffer, type: enc.type, engine, actualExt: enc.actualExt };
 }
-__name(transformRaster, "transformRaster");
+__name(processPhotonImage, "processPhotonImage");
 
 // ../response.ts
 async function computeEtag(body) {
@@ -4048,7 +4063,7 @@ app.all("*", async (c) => {
   const sameExt = origExt === requestedExt;
   const webpSource = source.type.includes("webp") || origExt === "webp";
   const ifNoneMatch = c.req.header("If-None-Match");
-  if (!transformed && source.svg && requestedExt === "svg") {
+  if (source.svg && requestedExt === "svg") {
     const body = new TextEncoder().encode(source.svg);
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);
@@ -4104,7 +4119,7 @@ var src_default = app;
 // [[path]].ts
 var onRequest = handle(src_default);
 
-// ../../.wrangler/tmp/pages-RIhKqY/functionsRoutes-0.20921619138855818.mjs
+// ../../.wrangler/tmp/pages-ZTUTNK/functionsRoutes-0.8874113666037513.mjs
 var routes = [
   {
     routePath: "/:path*",
