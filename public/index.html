@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
   <title>ImagEngine - Real-Time Image Optimization & Delivery Platform</title>
+  <link rel="icon" type="image/svg+xml" href="/logo.svg">
+  <link rel="alternate icon" href="/favicon.ico">
+  <meta property="og:title" content="ImagEngine - Real-Time Image Optimization & Delivery Platform">
+  <meta property="og:description" content="High-performance edge image transformation and optimization proxy for Cloudflare Pages & Workers using Hono, Photon (WASM), and resvg (WASM).">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://imagengine.pages.dev/">
+  <meta property="og:image" content="https://imagengine.pages.dev/og.webp">
+  <meta property="og:image:type" content="image/webp">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://imagengine.pages.dev/og.webp">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -50,6 +62,9 @@
       gap: 12px;
     }
     .logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       font-size: 1.25rem;
       font-weight: 800;
       color: #fff;
@@ -374,7 +389,10 @@
 
   <!-- Navigation -->
   <nav>
-    <a href="/" class="logo">Imag<span>Engine</span></a>
+    <a href="/" class="logo">
+      <img src="/logo.svg" alt="TopNepali Logo" width="28" height="28" style="vertical-align: middle;">
+      Imag<span>Engine</span>
+    </a>
     <ul class="nav-links">
       <li><a href="/" class="active">Home</a></li>
       <li><a href="/try-yourself.html">Try Yourself</a></li>

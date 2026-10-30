@@ -20,7 +20,18 @@ app.all('*', async (c) => {
   const query = Object.fromEntries(url.searchParams.entries());
   const cleanPath = url.pathname.replace(/^\/+|\/+$/g, '');
 
-  if (cleanPath === 'favicon.ico') return c.body(null, 204);
+  const isStaticAsset =
+    cleanPath === 'favicon.ico' ||
+    cleanPath === 'logo.svg' ||
+    cleanPath === 'og.svg' ||
+    cleanPath === 'og.webp';
+
+  if (isStaticAsset) {
+    if ((c.env as any)?.ASSETS) {
+      return (c.env as any).ASSETS.fetch(c.req.raw);
+    }
+    if (cleanPath === 'favicon.ico') return c.body(null, 204);
+  }
   if (!cleanPath) {
     if ((c.env as any)?.ASSETS) {
       return (c.env as any).ASSETS.fetch(c.req.raw);

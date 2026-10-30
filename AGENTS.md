@@ -16,6 +16,8 @@ ImagEngine is a zero-latency, WebAssembly-powered image optimization and transfo
   - Handles URL route parsing and upstream origin resolution.
   - Supports dual route patterns: slug-based conversion (`path-origExt.targetExt`) and query parameter-based conversion (`path.origExt?format=targetExt`).
   - Resolves and sanitizes transformation options (`w`, `h`, `fit`, `position`, `cw`, `ch`, `q`, etc.).
+- `src/fonts/embedded-fonts.ts`
+  - In-memory embedded TrueType typography buffers (Plus Jakarta Sans, Inter, Kalimati) decoded on isolate startup to power `@cf-wasm/resvg` text rendering without network lookups or OS system font dependencies.
 - `src/processor.ts`
   - Core image transformation engine.
   - Interfaces with `@cf-wasm/photon` (raster processing) and `@cf-wasm/resvg` (SVG rendering).
@@ -73,6 +75,12 @@ All agents and contributors must strictly adhere to the following rules:
 
 ### Invariant 7: Edge Route Whitelist
 - When adding new upstream tenant aliases or endpoints, always update both `TENANTS` in `src/constants.ts` and `include` in `public/_routes.json`.
+- Keep static assets (`/favicon.ico`, `/logo.svg`, `/og.svg`, `/og.webp`, `/index.html`, `/try-yourself.html`) explicitly listed under `exclude` in `public/_routes.json` so they are delivered directly from the Cloudflare edge cache with 0 worker invocations.
+
+### Invariant 8: WebAssembly Font Engine and Typography Preservation
+- In WebAssembly isolates, `resvg` has zero access to OS system fonts (`loadSystemFonts: false` is mandatory).
+- Calling `new Resvg()` without custom font buffers causes all `<text>` nodes in SVG assets to render completely blank or invisible.
+- Always provide `fontBuffers` from `getCoreFontBuffers()` (`src/fonts/embedded-fonts.ts`) to `Resvg`. This guarantees that Latin/English text (`Plus Jakarta Sans`, `Inter`) and Devanagari/Nepali text (`Kalimati`) render accurately with 100% glyph fidelity on every edge worker across all tenants (e.g. `fontsdir` / `fonts.tn`).
 
 ---
 

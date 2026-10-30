@@ -10,6 +10,7 @@ import {
   SamplingFilter,
 } from '@cf-wasm/photon';
 import { Resvg } from '@cf-wasm/resvg';
+import { getCoreFontBuffers } from './fonts/embedded-fonts';
 import {
   MIME,
   SVG_MAX_SIZE,
@@ -56,10 +57,17 @@ function cleanSvg(svg: string): string {
 }
 
 async function rasterizeSvg(svgText: string, targetWidth: number): Promise<Uint8Array> {
+  const fontBuffers = getCoreFontBuffers();
   const resvg = new Resvg(cleanSvg(svgText), {
     fitTo: { mode: 'width', value: targetWidth },
     background: 'rgba(255,255,255,0)',
-    font: { loadSystemFonts: false },
+    font: {
+      loadSystemFonts: false,
+      fontBuffers,
+      defaultFontFamily: 'Plus Jakarta Sans',
+      sansSerifFamily: 'Plus Jakarta Sans',
+      serifFamily: 'Kalimati',
+    },
   });
   return resvg.render().asPng();
 }

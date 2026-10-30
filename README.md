@@ -7,6 +7,7 @@ High-performance, zero-latency edge image optimization and transformation proxy 
 ## Features
 
 - **WebAssembly Performance**: Utilizes `@cf-wasm/photon` for fast raster image processing and `@cf-wasm/resvg` for pixel-perfect SVG rasterization directly on edge isolates.
+- **Embedded Typography & Font Rendering**: Pre-bundles core TrueType fonts in-memory (`Plus Jakarta Sans`, `Inter`, `Kalimati`) so that vector SVGs with text nodes (including English and Devanagari/Nepali scripts, such as `fontsdir` cards) render with 100% glyph accuracy on serverless edge isolates without OS dependencies.
 - **Zero-Config Cloudflare Pages Deployment**: Runs via Pages Advanced Mode (`public/_worker.js`), deploying in seconds with zero build commands required in the Cloudflare dashboard.
 - **Crash-Proof Crop-First Resizing**: Calculates target aspect ratios and crops before resizing in `fit=cover` mode, eliminating multi-megapixel intermediate buffer spikes and CPU timeouts.
 - **4x Upscale Protection**: Clamps upscale requests exceeding 4x source dimensions to prevent memory exhaustion and edge denial-of-service attempts.

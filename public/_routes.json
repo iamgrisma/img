@@ -20,6 +20,9 @@
     "/try-yourself",
     "/try-yourself.html",
     "/404.html",
-    "/favicon.ico"
+    "/favicon.ico",
+    "/logo.svg",
+    "/og.svg",
+    "/og.webp"
   ]
 }
