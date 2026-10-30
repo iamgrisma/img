@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler pages dev public",
-    "build": "tsc --noEmit",
+    "build": "tsc --noEmit && npx wrangler pages functions build --outdir public && node -e \"const fs = require('fs'); if (fs.existsSync('public/index.js')) fs.renameSync('public/index.js', 'public/_worker.js');\"",
     "deploy": "wrangler pages deploy public",
     "worker:dev": "wrangler dev",
     "worker:deploy": "wrangler deploy"
