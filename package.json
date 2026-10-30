@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler pages dev public",
-    "build": "tsc",
+    "build": "node scripts/build.js",
     "deploy": "wrangler pages deploy public",
     "worker:dev": "wrangler dev",
     "worker:deploy": "wrangler deploy"
