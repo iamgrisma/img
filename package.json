@@ -1,7 +1,24 @@
 {
   "name": "imagengine",
   "version": "1.0.0",
-  "private": true,
+  "description": "High-performance edge image transformation and optimization proxy for Cloudflare Pages and Workers using Hono, Photon (Wasm), and resvg (Wasm).",
+  "license": "MIT",
+  "author": "Grisma",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/iamgrisma/img.git"
+  },
+  "keywords": [
+    "cloudflare-pages",
+    "cloudflare-workers",
+    "image-optimization",
+    "image-processing",
+    "wasm",
+    "photon",
+    "resvg",
+    "hono",
+    "edge-computing"
+  ],
   "type": "module",
   "scripts": {
     "dev": "wrangler pages dev public",
