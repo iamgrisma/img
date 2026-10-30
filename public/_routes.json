@@ -4,7 +4,9 @@
     "/*"
   ],
   "exclude": [
-    "/favicon.ico"
+    "/",
+    "/index.html",
+    "/favicon.ico",
+    "/robots.txt"
   ]
 }
-
