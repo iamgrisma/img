@@ -16,6 +16,8 @@ import {
   RASTER_MAX_SIZE,
   FETCH_TIMEOUT_MS,
   DEFAULT_SVG_WIDTH,
+  MAX_DIMENSION,
+  MAX_UPSCALE_FACTOR,
 } from './constants';
 import { normalizeExt } from './routing';
 import type { TransformOptions } from './routing';
@@ -307,17 +309,25 @@ async function transformRaster(
     sh = image.get_height();
   }
 
-  if (opts.width && opts.height) {
-    image = executeResize(image, opts.width, opts.height, opts.fit, opts.position, toFree);
-  } else if (opts.width || opts.height) {
+  // Upscale limit: Maximum 4x of image dimensions (clamped at MAX_DIMENSION)
+  // If user requests larger than 4x, sticks at 4x (e.g. 400 requested as 1800 produces 1600)
+  const maxAllowedW = Math.min(sw * MAX_UPSCALE_FACTOR, MAX_DIMENSION);
+  const maxAllowedH = Math.min(sh * MAX_UPSCALE_FACTOR, MAX_DIMENSION);
+
+  const targetW = opts.width ? Math.min(opts.width, maxAllowedW) : null;
+  const targetH = opts.height ? Math.min(opts.height, maxAllowedH) : null;
+
+  if (targetW && targetH) {
+    image = executeResize(image, targetW, targetH, opts.fit, opts.position, toFree);
+  } else if (targetW || targetH) {
     let rw: number;
     let rh: number;
-    if (opts.width) {
-      rw = opts.width;
-      rh = Math.max(1, Math.round(sh * (opts.width / sw)));
+    if (targetW) {
+      rw = targetW;
+      rh = Math.max(1, Math.round(sh * (targetW / sw)));
     } else {
-      rh = opts.height!;
-      rw = Math.max(1, Math.round(sw * (opts.height! / sh)));
+      rh = targetH!;
+      rw = Math.max(1, Math.round(sw * (targetH! / sh)));
     }
     const old = image;
     image = resize(image, rw, rh, SamplingFilter.Lanczos3);
