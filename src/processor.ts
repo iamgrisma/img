@@ -134,17 +134,15 @@ function encodeImage(
     case 'jpg':
     case 'jpeg':
       return { buffer: img.get_bytes_jpeg(q), type: MIME.jpg, actualExt: 'jpg' };
-    case 'webp':
-      return { buffer: img.get_bytes_webp(), type: MIME.webp, actualExt: 'webp' };
     case 'png':
       return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
-    case 'avif':
-      // Fallback to webp as Photon wasm does not have AVIF encoder
+    case 'webp':
       return { buffer: img.get_bytes_webp(), type: MIME.webp, actualExt: 'webp' };
+    case 'avif':
     case 'gif':
-      return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
     default:
-      return { buffer: img.get_bytes(), type: MIME.png, actualExt: 'png' };
+      // Always fall back to webp for modern compression and smaller size
+      return { buffer: img.get_bytes_webp(), type: MIME.webp, actualExt: 'webp' };
   }
 }
 
