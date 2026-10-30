@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ImagEngine - Edge Image Processing & Optimization Proxy</title>
+  <title>ImagEngine - Real-Time Image Optimization & Delivery Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -29,9 +29,57 @@
       padding: 0;
       margin: 0;
     }
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo span {
+      color: var(--accent);
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: #fff;
+    }
+    .nav-btn {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #fff !important;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-weight: 600 !important;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .nav-btn:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+    }
     header {
       background: linear-gradient(180deg, rgba(56,189,248,0.08) 0%, rgba(11,15,25,0) 100%);
-      border-bottom: 1px solid var(--card-border);
       padding: 60px 20px 40px;
       text-align: center;
     }
@@ -39,14 +87,14 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 4px 12px;
+      padding: 4px 14px;
       border-radius: 9999px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-weight: 600;
       background: rgba(52, 211, 153, 0.1);
       color: var(--accent-green);
       border: 1px solid rgba(52, 211, 153, 0.25);
-      margin-bottom: 16px;
+      margin-bottom: 18px;
     }
     .badge-dot {
       width: 7px;
@@ -56,30 +104,100 @@
       box-shadow: 0 0 8px var(--accent-green);
     }
     h1 {
-      font-size: 2.8rem;
+      font-size: 3rem;
       font-weight: 800;
       letter-spacing: -0.03em;
-      margin-bottom: 12px;
-      background: linear-gradient(to right, #ffffff, #38bdf8);
+      margin-bottom: 16px;
+      background: linear-gradient(to right, #ffffff 40%, #38bdf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
     .tagline {
-      font-size: 1.15rem;
+      font-size: 1.18rem;
       color: var(--text-muted);
-      max-width: 680px;
-      margin: 0 auto;
+      max-width: 720px;
+      margin: 0 auto 30px;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .btn-primary {
+      background: #38bdf8;
+      color: #0b0f19;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s, transform 0.2s;
+      font-size: 1rem;
+    }
+    .btn-primary:hover {
+      background: #7dd3fc;
+      transform: translateY(-2px);
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background 0.2s;
+      font-size: 1rem;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
     }
     .container {
       max-width: 1040px;
       margin: 0 auto;
-      padding: 40px 20px 80px;
+      padding: 20px 20px 80px;
+    }
+    .whitelist-banner {
+      background: linear-gradient(90deg, rgba(56, 189, 248, 0.1) 0%, rgba(30, 41, 59, 0.5) 100%);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin: 30px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .whitelist-text h4 {
+      font-size: 1.1rem;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+    .whitelist-text p {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+    .whitelist-btn {
+      background: #38bdf8;
+      color: #0b0f19;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: background 0.2s;
+    }
+    .whitelist-btn:hover {
+      background: #7dd3fc;
     }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      margin: 30px 0 50px;
+      margin: 40px 0 50px;
     }
     .feature-card {
       background: var(--card-bg);
@@ -183,10 +301,6 @@
       background: rgba(52, 211, 153, 0.15);
       color: #34d399;
     }
-    .pill-amber {
-      background: rgba(251, 191, 36, 0.15);
-      color: #fbbf24;
-    }
     .scenario-title {
       font-weight: 600;
       color: #f8fafc;
@@ -196,42 +310,74 @@
     }
     footer {
       text-align: center;
-      padding: 40px 20px;
+      padding: 50px 20px;
       border-top: 1px solid var(--card-border);
       color: #64748b;
-      font-size: 0.88rem;
+      font-size: 0.92rem;
+    }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    footer a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
 
+  <!-- Top Navigation -->
+  <nav>
+    <a href="/" class="logo">⚡ Imag<span>Engine</span></a>
+    <ul class="nav-links">
+      <li><a href="/" class="active">Home</a></li>
+      <li><a href="/try-yourself.html">Try Yourself</a></li>
+      <li><a href="https://topnepali.com" target="_blank" rel="noopener">Blog</a></li>
+      <li><a href="https://topnepali.com/contact" target="_blank" rel="noopener" class="nav-btn">Contact / Whitelist</a></li>
+    </ul>
+  </nav>
+
   <header>
     <div class="badge">
-      <span class="badge-dot"></span> Cloudflare Pages Edge Powered
+      <span class="badge-dot"></span> High-Performance Media Optimization Platform
     </div>
     <h1>ImagEngine</h1>
-    <p class="tagline">High-performance edge image optimization, format conversion, and SVG rasterization proxy running natively on Cloudflare Pages Functions with WebAssembly.</p>
+    <p class="tagline">Next-generation real-time image optimization, intelligent WebP conversion, dynamic responsive resizing, and SVG vector rendering proxy.</p>
+    <div class="hero-actions">
+      <a href="/try-yourself.html" class="btn-primary">⚡ Try Interactive Playground &rarr;</a>
+      <a href="#scenarios" class="btn-secondary">Explore API Scenarios</a>
+    </div>
   </header>
 
   <div class="container">
 
+    <!-- Whitelist Access Banner -->
+    <div class="whitelist-banner">
+      <div class="whitelist-text">
+        <h4>🔒 Protected Origin Whitelisting</h4>
+        <p>ImagEngine operates on an authorized tenant whitelist to prevent abuse and guarantee maximum performance. Want to accelerate your media domain?</p>
+      </div>
+      <a href="https://topnepali.com/contact" target="_blank" rel="noopener" class="whitelist-btn">Request Domain Whitelist &rarr;</a>
+    </div>
+
     <!-- Core Highlights -->
     <div class="grid">
       <div class="feature-card">
-        <h3>⚡ Multi-Engine Architecture</h3>
-        <p>Uses <strong>@cf-wasm/resvg</strong> for crisp SVG vector rendering and <strong>@cf-wasm/photon</strong> (Rust WASM) for high-speed raster manipulation & WebP encoding.</p>
+        <h3>⚡ Real-Time WebP Conversion</h3>
+        <p>Automatically compresses heavy JPEG and PNG assets into lightweight WebP with up to 85% bandwidth reduction and zero quality degradation.</p>
       </div>
       <div class="feature-card">
-        <h3>🛡️ Edge Caching & Anti-DDoS</h3>
-        <p>Integrated with <strong>caches.default</strong> Cache API + 1-year immutable CDN headers. 404 errors feature <strong>300s negative caching</strong> to protect upstream quotas.</p>
+        <h3>📐 SVG Vector Rasterization</h3>
+        <p>Renders dynamic Open Graph cards, candidate badges, and typography banners directly from SVG source files into crisp social media formats.</p>
       </div>
       <div class="feature-card">
-        <h3>🔄 Zero-CPU Passthrough</h3>
-        <p>When the original extension matches the requested format without transformations, assets stream directly byte-for-byte with 0ms CPU penalty.</p>
+        <h3>🎯 Face-Anchored & Smart Crop</h3>
+        <p>Generate square avatars and custom thumbnails with intelligent top-anchoring (<code>position=top</code>) so portraits and faces are never cut off.</p>
       </div>
       <div class="feature-card">
-        <h3>🔧 Auto-Healing URLs</h3>
-        <p>Smart URL parser automatically resolves glued query parameters missing ampersands (e.g. <code>?h=630w=450</code> &rarr; <code>?h=630&w=450</code>).</p>
+        <h3>🛡️ Multi-Tier Global Caching</h3>
+        <p>Optimized images are instantly distributed and cached for 1 year with immutable ETag validators. Subsequent requests load in single-digit milliseconds.</p>
       </div>
     </div>
 
@@ -251,15 +397,15 @@
     </div>
 
     <!-- Supported Tenants -->
-    <h2>2. Tenant Origin Mapping</h2>
+    <h2>2. Currently Whitelisted Tenants</h2>
     <div class="doc-section">
-      <p>The first path segment identifies the target upstream domain, with optional subdomains:</p>
+      <p>The first path segment specifies the origin property. Requests to unauthorized domains are safely dropped at the network edge:</p>
       <table>
         <thead>
           <tr>
             <th>Tenant Key</th>
             <th>Resolved Origin Domain</th>
-            <th>Example Tenant Path</th>
+            <th>Sample Tenant Route</th>
           </tr>
         </thead>
         <tbody>
@@ -290,25 +436,26 @@
           </tr>
         </tbody>
       </table>
+      <p style="margin-top: 14px;"><em>Need your domain or CDN added? <a href="https://topnepali.com/contact" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">Contact us to request domain whitelisting</a>.</em></p>
     </div>
 
     <!-- Comprehensive Scenarios -->
-    <h2>3. All Possible Scenarios & Practical Examples</h2>
+    <h2 id="scenarios">3. Production Scenarios & Examples</h2>
 
     <!-- Scenario 1 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 01</span>
       <h3 style="margin-top: 8px;">Social Media OG Image (SVG &rarr; WebP at 1200x630)</h3>
-      <p>Render dynamic Open Graph SVG cards (like news, candidate cards, typography banners) into crisp WebP for Facebook, Viber, and WhatsApp crawlers.</p>
+      <p>Render dynamic Open Graph SVG cards into crisp WebP for Facebook, Viber, and Twitter crawlers.</p>
       <pre>GET /objects.tn/wp-content/uploads/2026/10/banner-svg.webp?w=1200&amp;h=630&amp;fit=cover</pre>
-      <p><strong>Under the hood:</strong> Resvg renders vector fonts and graphics into pixel-perfect PNG, then Photon encodes to WebP at <code>q=85</code> (~35KB output). Result is edge-cached for 1 year.</p>
+      <p><strong>Under the hood:</strong> Vector graphics and fonts are rasterized into pixel-perfect WebP at <code>q=85</code> (~35KB output) and globally cached for 1 year.</p>
     </div>
 
     <!-- Scenario 2 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 02</span>
-      <h3 style="margin-top: 8px;">Candidate / User Profile Avatar (Square Crop Anchored to Face)</h3>
-      <p>Easily create 256x256 square avatars anchored to the top so heads and faces are never chopped off.</p>
+      <h3 style="margin-top: 8px;">Candidate & Profile Avatar (Square Crop Anchored to Face)</h3>
+      <p>Generate 256x256 square avatars anchored to the top so heads and faces are never chopped off.</p>
       <pre># Quick avatar preset:
 GET /ecn/candidates/kamal-png.webp?avatar=1
 
@@ -381,13 +528,12 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 6 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 06</span>
-      <h3 style="margin-top: 8px;">Cross-Format Transformations Matrix</h3>
+      <h3 style="margin-top: 8px;">Format Transformations & Passthrough</h3>
       <table>
         <thead>
           <tr>
             <th>Source</th>
             <th>Target</th>
-            <th>Engine</th>
             <th>Behavior</th>
           </tr>
         </thead>
@@ -395,44 +541,32 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
           <tr>
             <td>SVG</td>
             <td>WebP</td>
-            <td><span class="pill">resvg-svg</span></td>
-            <td>Renders crisp vector to raster at target size, encodes to WebP.</td>
+            <td>Renders crisp vector to raster at target size, encodes to lightweight WebP.</td>
           </tr>
           <tr>
             <td>SVG</td>
             <td>PNG</td>
-            <td><span class="pill">resvg-svg</span></td>
-            <td>Direct rasterization from Resvg into lossless PNG.</td>
+            <td>Direct rasterization into lossless PNG format.</td>
           </tr>
           <tr>
             <td>SVG</td>
             <td>SVG</td>
-            <td><span class="pill pill-green">edge-passthrough</span></td>
-            <td><strong>0ms CPU:</strong> Returns pristine SVG directly with 1-year cache.</td>
+            <td><strong>Untouched Stream:</strong> Returns pristine SVG directly with 1-year cache.</td>
           </tr>
           <tr>
             <td>JPEG</td>
             <td>WebP</td>
-            <td><span class="pill">photon-raster</span></td>
             <td>Decodes JPEG, applies transforms, encodes to lightweight WebP.</td>
           </tr>
           <tr>
             <td>PNG</td>
             <td>WebP</td>
-            <td><span class="pill">photon-raster</span></td>
             <td>Compresses heavy PNG to WebP with up to 85% bandwidth reduction.</td>
           </tr>
           <tr>
             <td>WebP</td>
             <td>WebP</td>
-            <td><span class="pill pill-green">edge-passthrough</span></td>
-            <td>No transform &rarr; direct stream. If resized &rarr; re-encoded via Photon.</td>
-          </tr>
-          <tr>
-            <td>Raster</td>
-            <td>AVIF</td>
-            <td><span class="pill pill-amber">format-fallback</span></td>
-            <td>Safely falls back to WebP with <code>X-Format-Fallback: avif&rarr;webp</code>.</td>
+            <td>No transform &rarr; direct stream. If resized &rarr; re-encoded to target dimensions.</td>
           </tr>
         </tbody>
       </table>
@@ -441,70 +575,56 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 7 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 07</span>
-      <h3 style="margin-top: 8px;">Sharp-Compatible Filters, Rotation & Grayscale</h3>
-      <p>Supports all classic Sharp image transformations directly in WebAssembly:</p>
-      <pre># Quality setting (1 to 100, default 85):
+      <h3 style="margin-top: 8px;">Rotation, Grayscale & Creative Filters</h3>
+      <p>Comprehensive image transformation capabilities:</p>
+      <pre># Quality tuning (1 to 100, default 85):
 GET /object.gcom/photo-jpg.webp?q=92   # High quality photography
 GET /object.gcom/photo-jpg.webp?q=60   # Mobile lightweight preview
 
-# Rotation & Flipping (Sharp parity):
-GET /object.gcom/photo-jpg.webp?rotate=90   # Rotate 90 degrees clockwise
+# Rotation & Mirror Flipping:
+GET /object.gcom/photo-jpg.webp?rotate=90   # Rotate 90 degrees
 GET /object.gcom/photo-jpg.webp?flip=h      # Horizontal mirror flip
 GET /object.gcom/photo-jpg.webp?flop=1      # Vertical flip
 
-# Color & Creative filters:
+# Color & Creative Filters:
 GET /object.gcom/photo-jpg.webp?grayscale=1       # Human-eye corrected black & white
 GET /object.gcom/photo-jpg.webp?w=800&amp;blur=6      # Gaussian blur (preview placeholders)
-GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for crisp high-detail graphics</pre>
+GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for high-detail graphics</pre>
     </div>
 
     <!-- Scenario 8 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 08</span>
-      <h3 style="margin-top: 8px;">Edge-Level Route Defense & 404 Shield (Zero-Worker Hit)</h3>
-      <p>Protection against quota drainage, scanning bots, and DDoS flooding:</p>
+      <h3 style="margin-top: 8px;">Multi-Tier Negative Caching & Edge Shield</h3>
+      <p>Protection against quota drainage, broken links, and scanning bots:</p>
       <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.93rem; margin-bottom: 12px;">
-        <li><strong>Random/Junk Paths (e.g. <code>/randoafaslkdaf</code>, <code>/wp-login.php</code>):</strong> 
-          Filtered immediately at the Cloudflare Edge CDN using <code>_routes.json</code> whitelist. Never touches or invokes the Worker function (<strong>0 Worker Requests</strong>, 0ms CPU).
-        </li>
-        <li><strong>Deleted/Missing Upstream Images:</strong> 
-          When an image does not exist on origin, the 404 response is negative-cached for <strong>300 seconds (5 minutes)</strong>. Subsequent requests are absorbed entirely by Cloudflare CDN cache.
-        </li>
+        <li><strong>Unauthorized & Random URLs:</strong> Dropped immediately at the global network edge before any server execution.</li>
+        <li><strong>Missing Upstream Media:</strong> When an image does not exist on origin, the 404 response is negative-cached for <strong>300 seconds (5 minutes)</strong> to absorb repeated hits.</li>
       </ul>
-      <pre># Edge Routing Defense (_routes.json):
-Only valid tenant routes (/tn/*, /*.tn/*, /ginfo/*, /gcom/*, /gname/*, /ecn/*) invoke the Worker.
-All non-image paths are dropped by Cloudflare Edge as instant 404s without consuming Worker quota!</pre>
     </div>
 
     <!-- Scenario 9 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 09</span>
-      <h3 style="margin-top: 8px;">10MB+ Large Image & Memory Protection</h3>
-      <p>Cloudflare Workers enforce a 128 MB RAM limit. ImagEngine incorporates defensive safeguards:</p>
-      <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.93rem;">
-        <li><strong>Passthrough:</strong> Large images requested in their original format bypass WASM entirely and stream with near-zero RAM usage.</li>
-        <li><strong>36 Megapixel Safe Guard:</strong> If a decoded raster exceeds 36 Megapixels (~144 MB raw buffer), ImagEngine safely returns <code>413 Payload Too Large</code> instead of crashing the Worker process.</li>
-        <li><strong>Deterministic Memory Freeing:</strong> Every intermediate Photon and Resvg WASM instance is explicitly freed using <code>img.free()</code> to prevent heap leakage.</li>
-      </ul>
-    </div>
-
-    <!-- Scenario 10 -->
-    <div class="doc-section">
-      <span class="pill pill-green">Scenario 10</span>
       <h3 style="margin-top: 8px;">Auto-Healing Malformed Query Strings</h3>
       <p>Sometimes CMS themes, social scrapers, or third-party links concatenate query parameters without standard ampersands (e.g. <code>?h=630w=450</code> instead of <code>?h=630&amp;w=450</code>).</p>
-      <pre># Legacy/Broken URL from scraper:
+      <pre># Broken URL from scraper:
 GET /objects.tn/banner-webp.webp?h=630w=450
 
 # Automatically normalized internally to:
 GET /objects.tn/banner-webp.webp?h=630&amp;w=450  &rarr; Exact 450x630 output!</pre>
-      <p>ImagEngine automatically detects and normalizes these parameters on the fly, preventing unwanted distortions without requiring any code changes on the caller's side.</p>
     </div>
 
   </div>
 
+  <!-- Footer -->
   <footer>
-    ImagEngine &copy; 2026 &bull; High Performance Serverless Media Proxy &bull; Powered by Cloudflare Pages &amp; WebAssembly
+    <p>ImagEngine &bull; Real-Time Image Optimization &amp; Delivery Platform</p>
+    <p style="margin-top: 8px;">
+      Developed with ❤️ by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; 
+      <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a> &bull; 
+      <a href="https://topnepali.com/contact" target="_blank" rel="noopener">Contact / Request Whitelist</a>
+    </p>
   </footer>
 
 </body>

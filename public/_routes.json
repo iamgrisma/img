@@ -14,5 +14,12 @@
     "/api",
     "/health"
   ],
-  "exclude": []
+  "exclude": [
+    "/",
+    "/index.html",
+    "/try-yourself",
+    "/try-yourself.html",
+    "/404.html",
+    "/favicon.ico"
+  ]
 }
