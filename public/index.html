@@ -20,14 +20,21 @@
       --code-bg: #030712;
       --code-border: #1e293b;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      position: relative;
       background: var(--bg);
       color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.6;
-      padding: 0;
-      margin: 0;
       -webkit-font-smoothing: antialiased;
     }
     nav {
@@ -35,14 +42,15 @@
       align-items: center;
       justify-content: space-between;
       max-width: 1100px;
+      width: 100%;
       margin: 0 auto;
-      padding: 16px 20px;
+      padding: 14px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       flex-wrap: wrap;
       gap: 12px;
     }
     .logo {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #fff;
       text-decoration: none;
@@ -54,16 +62,17 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 12px;
       list-style: none;
       flex-wrap: wrap;
     }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       transition: color 0.2s;
+      padding: 4px 6px;
     }
     .nav-links a:hover, .nav-links a.active {
       color: #fff;
@@ -71,7 +80,7 @@
     .nav-btn {
       background: #0284c7;
       color: #fff !important;
-      padding: 8px 16px;
+      padding: 6px 14px !important;
       border-radius: 6px;
       font-weight: 600 !important;
       transition: background 0.2s;
@@ -81,8 +90,10 @@
     }
     header {
       background: linear-gradient(180deg, rgba(56,189,248,0.06) 0%, rgba(11,15,25,0) 100%);
-      padding: 50px 20px 30px;
+      padding: 40px 16px 24px;
       text-align: center;
+      width: 100%;
+      max-width: 100%;
     }
     .badge {
       display: inline-flex;
@@ -90,37 +101,39 @@
       gap: 6px;
       padding: 4px 12px;
       border-radius: 9999px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       background: rgba(52, 211, 153, 0.1);
       color: var(--accent-green);
       border: 1px solid rgba(52, 211, 153, 0.25);
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
     .badge-dot {
-      width: 7px;
-      height: 7px;
+      width: 6px;
+      height: 6px;
       border-radius: 50%;
       background: var(--accent-green);
     }
     h1 {
-      font-size: 2.8rem;
+      font-size: 2.4rem;
       font-weight: 800;
       letter-spacing: -0.03em;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       color: #fff;
+      word-break: break-word;
     }
     .tagline {
-      font-size: 1.12rem;
+      font-size: 1.05rem;
       color: var(--text-muted);
-      max-width: 720px;
-      margin: 0 auto 28px;
+      max-width: 680px;
+      margin: 0 auto 24px;
+      padding: 0 8px;
     }
     .hero-actions {
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 14px;
+      gap: 12px;
       margin-bottom: 16px;
       flex-wrap: wrap;
     }
@@ -128,11 +141,11 @@
       background: #38bdf8;
       color: #0b0f19;
       font-weight: 700;
-      padding: 12px 22px;
+      padding: 10px 20px;
       border-radius: 6px;
       text-decoration: none;
       transition: background 0.2s;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .btn-primary:hover {
       background: #7dd3fc;
@@ -142,55 +155,60 @@
       border: 1px solid var(--card-border);
       color: #fff;
       font-weight: 600;
-      padding: 12px 22px;
+      padding: 10px 20px;
       border-radius: 6px;
       text-decoration: none;
       transition: background 0.2s;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
     }
     .btn-secondary:hover {
       background: rgba(255, 255, 255, 0.1);
     }
     @media (max-width: 600px) {
-      header { padding: 36px 16px 20px; }
-      h1 { font-size: 1.9rem; }
-      .tagline { font-size: 0.98rem; }
-      .hero-actions { flex-direction: column; width: 100%; }
+      header { padding: 28px 12px 18px; }
+      h1 { font-size: 1.8rem; }
+      .tagline { font-size: 0.95rem; }
+      .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
       .btn-primary, .btn-secondary { width: 100%; text-align: center; }
     }
     .container {
       max-width: 1040px;
+      width: 100%;
       margin: 0 auto;
-      padding: 16px 20px 60px;
+      padding: 12px 16px 50px;
     }
     .whitelist-banner {
       background: rgba(56, 189, 248, 0.06);
       border: 1px solid rgba(56, 189, 248, 0.25);
       border-radius: 10px;
-      padding: 18px 20px;
-      margin: 24px 0;
+      padding: 16px;
+      margin: 20px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 16px;
+      gap: 14px;
       flex-wrap: wrap;
+      width: 100%;
+    }
+    .whitelist-text {
+      flex: 1 1 260px;
     }
     .whitelist-text h4 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: #f1f5f9;
       margin-bottom: 4px;
     }
     .whitelist-text p {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
     .whitelist-btn {
       background: #38bdf8;
       color: #0b0f19;
-      padding: 9px 18px;
+      padding: 8px 16px;
       border-radius: 6px;
       font-weight: 700;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       text-decoration: none;
       white-space: nowrap;
       transition: background 0.2s;
@@ -198,86 +216,108 @@
     .whitelist-btn:hover {
       background: #7dd3fc;
     }
+    @media (max-width: 600px) {
+      .whitelist-banner {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .whitelist-btn {
+        width: 100%;
+        text-align: center;
+      }
+    }
     .grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
-      margin: 32px 0 44px;
+      grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+      gap: 14px;
+      margin: 24px 0 36px;
+      width: 100%;
     }
     .feature-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 20px;
+      border-radius: 8px;
+      padding: 16px;
       transition: border-color 0.2s;
     }
     .feature-card:hover {
       border-color: rgba(56, 189, 248, 0.4);
     }
     .feature-card h3 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       color: var(--accent);
-      margin-bottom: 8px;
+      margin-bottom: 6px;
     }
     .feature-card p {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
     }
     h2 {
-      font-size: 1.6rem;
+      font-size: 1.45rem;
       font-weight: 700;
-      margin: 40px 0 16px;
+      margin: 32px 0 14px;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
     }
     .doc-section {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 20px;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      width: 100%;
+      overflow: hidden;
     }
     .doc-section h3 {
-      font-size: 1.15rem;
-      margin-bottom: 8px;
+      font-size: 1.08rem;
+      margin-bottom: 6px;
       color: #e2e8f0;
     }
     .doc-section p {
       color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 12px;
+      font-size: 0.88rem;
+      margin-bottom: 10px;
     }
     code {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85em;
+      font-size: 0.84em;
       background: rgba(56, 189, 248, 0.1);
       color: #7dd3fc;
-      padding: 2px 6px;
+      padding: 2px 5px;
       border-radius: 4px;
+      word-break: break-word;
     }
     pre {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
       border-radius: 6px;
-      padding: 12px 16px;
+      padding: 10px 14px;
       overflow-x: auto;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       color: #e2e8f0;
-      margin: 8px 0 14px;
+      margin: 8px 0 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+      width: 100%;
+      max-width: 100%;
+      -webkit-overflow-scrolling: touch;
     }
     .table-wrapper {
+      width: 100%;
+      max-width: 100%;
       overflow-x: auto;
-      margin: 12px 0;
+      margin: 10px 0;
+      -webkit-overflow-scrolling: touch;
+      display: block;
     }
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 0.88rem;
-      min-width: 480px;
+      font-size: 0.85rem;
     }
     th, td {
-      padding: 10px 12px;
+      padding: 8px 10px;
       text-align: left;
       border-bottom: 1px solid var(--card-border);
     }
@@ -294,10 +334,10 @@
     }
     .pill {
       display: inline-block;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       text-transform: uppercase;
-      padding: 2px 8px;
+      padding: 2px 6px;
       border-radius: 4px;
       background: rgba(56, 189, 248, 0.15);
       color: #38bdf8;
@@ -309,16 +349,16 @@
     .scenario-title {
       font-weight: 600;
       color: #f8fafc;
-      font-size: 0.95rem;
-      margin-top: 16px;
+      font-size: 0.92rem;
+      margin-top: 14px;
       margin-bottom: 4px;
     }
     footer {
       text-align: center;
-      padding: 36px 16px;
+      padding: 30px 16px;
       border-top: 1px solid var(--card-border);
       color: #64748b;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
     }
     footer a {
       color: var(--accent);
@@ -443,7 +483,7 @@
           </tbody>
         </table>
       </div>
-      <p style="margin-top: 14px;"><em>Need your domain or CDN added? <a href="https://topnepali.com/contact" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">Contact us to request domain whitelisting</a>.</em></p>
+      <p style="margin-top: 10px;"><em>Need your domain or CDN added? <a href="https://topnepali.com/contact" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: underline;">Contact us to request domain whitelisting</a>.</em></p>
     </div>
 
     <!-- Production Scenarios -->
@@ -452,7 +492,7 @@
     <!-- Scenario 1 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 01</span>
-      <h3 style="margin-top: 8px;">Social Media OG Image (SVG &rarr; WebP at 1200x630)</h3>
+      <h3 style="margin-top: 6px;">Social Media OG Image (SVG &rarr; WebP at 1200x630)</h3>
       <p>Render dynamic Open Graph SVG cards into crisp WebP for Facebook, Viber, and Twitter crawlers.</p>
       <pre>GET /objects.tn/wp-content/uploads/2026/10/banner-svg.webp?w=1200&amp;h=630&amp;fit=cover</pre>
       <p>Vector graphics and fonts are rasterized into pixel-perfect WebP and globally cached for 1 year.</p>
@@ -461,7 +501,7 @@
     <!-- Scenario 2 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 02</span>
-      <h3 style="margin-top: 8px;">Candidate &amp; Profile Avatar (Square Crop Anchored to Face)</h3>
+      <h3 style="margin-top: 6px;">Candidate &amp; Profile Avatar (Square Crop Anchored to Face)</h3>
       <p>Generate 256x256 square avatars anchored to the top so heads and faces are never chopped off.</p>
       <pre># Quick avatar preset:
 GET /ecn/candidates/kamal-png.webp?avatar=1
@@ -473,7 +513,7 @@ GET /ecn/candidates/kamal-png.webp?w=300&amp;h=300&amp;fit=cover&amp;position=to
     <!-- Scenario 3 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 03</span>
-      <h3 style="margin-top: 8px;">Proportional Aspect-Ratio Resizing (Single Dimension)</h3>
+      <h3 style="margin-top: 6px;">Proportional Aspect-Ratio Resizing (Single Dimension)</h3>
       <p>Supply either width or height alone; ImagEngine automatically calculates the other dimension maintaining exact aspect ratio without distortion.</p>
       <pre># Resize to 500px width (auto height):
 GET /object.gcom/uploads/photo.jpg?w=500&amp;format=webp
@@ -485,7 +525,7 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 4 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 04</span>
-      <h3 style="margin-top: 8px;">Fit Modes: 600x600 from a 1000x1120 Portrait Photo</h3>
+      <h3 style="margin-top: 6px;">Fit Modes: 600x600 from a 1000x1120 Portrait Photo</h3>
       <p>Control exact cropping and fitting behavior when providing both width and height:</p>
       <div class="table-wrapper">
         <table>
@@ -525,7 +565,7 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 5 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 05</span>
-      <h3 style="margin-top: 8px;">Crop Alignment (Position Anchoring)</h3>
+      <h3 style="margin-top: 6px;">Crop Alignment (Position Anchoring)</h3>
       <p>When cropping with fit=cover, control which part of the image is kept:</p>
       <pre>?w=600&amp;h=600&amp;fit=cover&amp;position=center   # Default: center crop
 ?w=600&amp;h=600&amp;fit=cover&amp;position=top      # Top anchor (perfect for portraits)
@@ -537,7 +577,7 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 6 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 06</span>
-      <h3 style="margin-top: 8px;">Format Transformations &amp; Passthrough</h3>
+      <h3 style="margin-top: 6px;">Format Transformations &amp; Passthrough</h3>
       <div class="table-wrapper">
         <table>
           <thead>
@@ -586,7 +626,7 @@ GET /object.gcom/uploads/photo.jpg?h=400&amp;format=webp</pre>
     <!-- Scenario 7 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 07</span>
-      <h3 style="margin-top: 8px;">Rotation, Grayscale &amp; Creative Filters</h3>
+      <h3 style="margin-top: 6px;">Rotation, Grayscale &amp; Creative Filters</h3>
       <p>Comprehensive image transformation capabilities with loss-free rotation:</p>
       <pre># Quality tuning (1 to 100, default 85):
 GET /object.gcom/photo-jpg.webp?q=92   # High quality photography
@@ -606,9 +646,9 @@ GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for high-de
     <!-- Scenario 8 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 08</span>
-      <h3 style="margin-top: 8px;">Multi-Tier Negative Caching &amp; Edge Shield</h3>
+      <h3 style="margin-top: 6px;">Multi-Tier Negative Caching &amp; Edge Shield</h3>
       <p>Protection against quota drainage, broken links, and scanning bots:</p>
-      <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px;">
+      <ul style="margin-left: 20px; color: var(--text-muted); font-size: 0.88rem; margin-bottom: 10px;">
         <li><strong>Unauthorized &amp; Random URLs:</strong> Dropped immediately at the global network edge before any server execution.</li>
         <li><strong>Missing Upstream Media:</strong> When an image does not exist on origin, the 404 response is negative-cached for 300 seconds (5 minutes) to absorb repeated hits.</li>
       </ul>
@@ -617,7 +657,7 @@ GET /object.gcom/photo-jpg.webp?w=800&amp;sharpen=1   # Unsharp mask for high-de
     <!-- Scenario 9 -->
     <div class="doc-section">
       <span class="pill pill-green">Scenario 09</span>
-      <h3 style="margin-top: 8px;">Auto-Healing Malformed Query Strings</h3>
+      <h3 style="margin-top: 6px;">Auto-Healing Malformed Query Strings</h3>
       <p>CMS themes or social scrapers sometimes concatenate query parameters without standard ampersands (e.g. <code>?h=630w=450</code> instead of <code>?h=630&amp;w=450</code>).</p>
       <pre># Broken URL from scraper:
 GET /objects.tn/banner-webp.webp?h=630w=450

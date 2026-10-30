@@ -20,14 +20,21 @@
       --code-bg: #030712;
       --code-border: #1e293b;
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    *, *::before, *::after {
+      box-sizing: border-box;
+      min-width: 0;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+      position: relative;
       background: var(--bg);
       color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       line-height: 1.5;
-      padding: 0;
-      margin: 0;
       -webkit-font-smoothing: antialiased;
     }
     nav {
@@ -35,14 +42,15 @@
       align-items: center;
       justify-content: space-between;
       max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
-      padding: 16px 20px;
+      padding: 14px 16px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       flex-wrap: wrap;
       gap: 12px;
     }
     .logo {
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #fff;
       text-decoration: none;
@@ -54,17 +62,17 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 16px;
+      gap: 12px;
       list-style: none;
       flex-wrap: wrap;
     }
     .nav-links a {
       color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 500;
       transition: color 0.2s;
-      padding: 6px 4px;
+      padding: 4px 6px;
     }
     .nav-links a:hover, .nav-links a.active {
       color: #fff;
@@ -72,7 +80,7 @@
     .nav-btn {
       background: #0284c7;
       color: #fff !important;
-      padding: 8px 16px !important;
+      padding: 6px 14px !important;
       border-radius: 6px;
       font-weight: 600 !important;
       transition: background 0.2s;
@@ -82,36 +90,40 @@
     }
     .playground-header {
       text-align: center;
-      padding: 32px 16px 16px;
+      padding: 28px 16px 14px;
       max-width: 800px;
       margin: 0 auto;
+      width: 100%;
     }
     .playground-header h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       font-weight: 800;
       letter-spacing: -0.03em;
       margin-bottom: 8px;
       color: #fff;
+      word-break: break-word;
     }
     .playground-header p {
       color: var(--text-muted);
-      font-size: 1rem;
+      font-size: 0.95rem;
+      padding: 0 8px;
     }
     .container {
       max-width: 1200px;
+      width: 100%;
       margin: 0 auto;
-      padding: 16px 16px 60px;
+      padding: 12px 16px 50px;
       display: grid;
-      grid-template-columns: 440px 1fr;
-      gap: 24px;
+      grid-template-columns: 420px minmax(0, 1fr);
+      gap: 20px;
     }
     @media (max-width: 960px) {
       .container {
         grid-template-columns: 1fr;
-        padding-bottom: 40px;
+        padding-bottom: 30px;
       }
       .playground-header h1 {
-        font-size: 1.8rem;
+        font-size: 1.6rem;
       }
     }
     @media (max-width: 480px) {
@@ -122,78 +134,90 @@
       .nav-links {
         width: 100%;
         justify-content: flex-start;
-        gap: 12px;
+        gap: 8px;
       }
       .playground-header {
         text-align: left;
-        padding: 20px 16px 12px;
+        padding: 16px 12px 10px;
       }
       .playground-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.4rem;
       }
       .container {
-        padding: 12px 12px 40px;
+        padding: 8px 12px 30px;
+        gap: 16px;
       }
     }
     .panel {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 10px;
+      padding: 18px;
+      width: 100%;
+      max-width: 100%;
+      overflow: hidden;
     }
     @media (max-width: 480px) {
       .panel {
-        padding: 16px;
+        padding: 14px;
       }
     }
     .panel-title {
-      font-size: 1.1rem;
+      font-size: 1.05rem;
       font-weight: 700;
       color: #f1f5f9;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       border-bottom: 1px solid var(--card-border);
-      padding-bottom: 10px;
+      padding-bottom: 8px;
     }
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
+      width: 100%;
     }
     .form-label {
       display: flex;
       justify-content: space-between;
-      font-size: 0.85rem;
+      align-items: center;
+      font-size: 0.82rem;
       font-weight: 600;
       color: #cbd5e1;
-      margin-bottom: 6px;
+      margin-bottom: 4px;
     }
     .form-label .val {
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
     }
     input[type="text"], select {
       width: 100%;
+      max-width: 100%;
       background: var(--code-bg);
       border: 1px solid var(--code-border);
       color: #fff;
-      padding: 10px 12px;
+      padding: 8px 10px;
       border-radius: 6px;
-      font-size: 0.9rem;
+      font-size: 0.86rem;
       font-family: inherit;
       outline: none;
       transition: border-color 0.2s;
+      text-overflow: ellipsis;
     }
     input[type="text"]:focus, select:focus {
       border-color: var(--accent);
     }
     input[type="range"] {
       width: 100%;
+      max-width: 100%;
       accent-color: var(--accent);
       cursor: pointer;
       height: 6px;
+      display: block;
     }
     .presets-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      width: 100%;
     }
     @media (max-width: 400px) {
       .presets-grid {
@@ -204,13 +228,14 @@
       background: rgba(56, 189, 248, 0.08);
       border: 1px solid rgba(56, 189, 248, 0.2);
       color: #e0f2fe;
-      padding: 8px 10px;
+      padding: 8px;
       border-radius: 6px;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 600;
       cursor: pointer;
       text-align: center;
       transition: all 0.2s;
+      width: 100%;
     }
     .preset-btn:hover {
       background: rgba(56, 189, 248, 0.2);
@@ -218,18 +243,19 @@
     }
     .radio-group {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       flex-wrap: wrap;
+      width: 100%;
     }
     .radio-label {
       display: flex;
       align-items: center;
       gap: 6px;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       color: #e2e8f0;
       cursor: pointer;
       background: var(--code-bg);
-      padding: 8px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
       border: 1px solid var(--code-border);
       flex: 1 1 auto;
@@ -237,8 +263,9 @@
     }
     .checkbox-grid {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+      width: 100%;
     }
     @media (max-width: 400px) {
       .checkbox-grid {
@@ -248,47 +275,52 @@
     .checkbox-label {
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
+      gap: 6px;
+      font-size: 0.82rem;
       color: #e2e8f0;
       cursor: pointer;
       background: var(--code-bg);
-      padding: 8px 10px;
+      padding: 6px 8px;
       border-radius: 6px;
       border: 1px solid var(--code-border);
+      width: 100%;
     }
     .url-box {
       background: var(--code-bg);
       border: 1px solid var(--code-border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 16px;
+      border-radius: 6px;
+      padding: 8px 12px;
+      margin-bottom: 14px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 10px;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
       flex-wrap: wrap;
     }
     .url-text {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
+      font-size: 0.78rem;
       color: #7dd3fc;
-      overflow-x: auto;
-      white-space: nowrap;
-      flex: 1 1 200px;
-      padding: 4px 0;
+      word-break: break-all;
+      overflow-wrap: anywhere;
+      line-height: 1.4;
+      flex: 1 1 180px;
+      max-width: 100%;
     }
     .copy-btn {
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: #38bdf8;
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
       transition: all 0.2s;
+      flex-shrink: 0;
     }
     .copy-btn:hover {
       background: var(--accent);
@@ -297,31 +329,34 @@
     .preview-container {
       background: #030712;
       border: 1px solid var(--card-border);
-      border-radius: 10px;
-      min-height: 320px;
+      border-radius: 8px;
+      min-height: 280px;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
       overflow: hidden;
-      padding: 16px;
+      padding: 12px;
+      width: 100%;
+      max-width: 100%;
     }
     .preview-img {
       max-width: 100%;
       height: auto;
-      max-height: 480px;
+      max-height: 440px;
       border-radius: 6px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
       transition: opacity 0.2s;
       object-fit: contain;
+      display: block;
     }
     .preview-img.loading {
       opacity: 0.4;
     }
     .spinner {
       position: absolute;
-      width: 32px;
-      height: 32px;
+      width: 28px;
+      height: 28px;
       border: 3px solid rgba(56, 189, 248, 0.2);
       border-top-color: var(--accent);
       border-radius: 50%;
@@ -333,25 +368,28 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 14px;
-      padding: 10px 14px;
+      margin-top: 12px;
+      padding: 8px 12px;
       background: rgba(255, 255, 255, 0.02);
       border-radius: 6px;
       border: 1px solid var(--card-border);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: var(--text-muted);
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 8px;
+      width: 100%;
+      max-width: 100%;
     }
     .metrics-bar strong {
       color: #f1f5f9;
     }
     footer {
       text-align: center;
-      padding: 32px 16px;
+      padding: 28px 16px;
       border-top: 1px solid var(--card-border);
       color: #64748b;
-      font-size: 0.88rem;
+      font-size: 0.85rem;
+      width: 100%;
     }
     footer a {
       color: var(--accent);
@@ -436,7 +474,7 @@
       </div>
 
       <!-- Fit & Position -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px;">
+      <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; margin-bottom: 14px; width: 100%;">
         <div>
           <label class="form-label"><span>Fit Mode</span></label>
           <select id="fitSelect" onchange="updateTransformation()">
@@ -469,7 +507,7 @@
         <label class="form-label"><span>Filters &amp; Mirroring</span></label>
         <div class="checkbox-grid">
           <label class="checkbox-label">
-            <input type="checkbox" id="grayscaleCheck" onchange="updateTransformation()"> Grayscale (B&amp;W)
+            <input type="checkbox" id="grayscaleCheck" onchange="updateTransformation()"> Grayscale
           </label>
           <label class="checkbox-label">
             <input type="checkbox" id="sharpenCheck" onchange="updateTransformation()"> Sharpen Mask
