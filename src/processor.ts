@@ -196,6 +196,14 @@ async function transformRaster(
   let sw = image.get_width();
   let sh = image.get_height();
 
+  // Guard: if uncompressed pixels exceed 36 megapixels (~144MB raw RGBA), reject with 413 to prevent Worker Out-of-Memory
+  if (sw * sh > 36_000_000) {
+    image.free();
+    const e = new Error(`Image resolution too large (${sw}x${sh}). Maximum supported is 36 megapixels.`);
+    (e as any).status = 413;
+    throw e;
+  }
+
   if (opts.cropWidth || opts.cropHeight) {
     const cw = opts.cropWidth ? Math.min(opts.cropWidth, sw) : sw;
     const ch = opts.cropHeight ? Math.min(opts.cropHeight, sh) : sh;

@@ -39,11 +39,22 @@ export function notModifiedResponse(etag: string): Response {
 }
 
 export function errorResponse(status: number, message: string): Response {
+  const isNotFound = status === 404;
+  const headers = new Headers();
+  headers.set('Content-Type', 'application/json; charset=utf-8');
+
+  if (isNotFound) {
+    // 300 seconds (5 mins) negative caching to protect against 404 DDoS / quota drain
+    const notFoundCache = 'public, max-age=300, s-maxage=300';
+    headers.set('Cache-Control', notFoundCache);
+    headers.set('CDN-Cache-Control', notFoundCache);
+    headers.set('Cloudflare-CDN-Cache-Control', notFoundCache);
+  } else {
+    headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+  }
+
   return new Response(JSON.stringify({ error: message, status }), {
     status,
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-      'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
-    },
+    headers,
   });
 }

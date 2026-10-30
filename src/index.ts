@@ -38,9 +38,23 @@ app.all('*', async (c) => {
     );
   }
 
+  function sendResponse(res: Response): Response {
+    if (cache && c.executionCtx) {
+      // Only cache 200 OK (1 year) and 404 Not Found (negative caching 300s)
+      if (res.status === 200 || res.status === 404) {
+        try {
+          c.executionCtx.waitUntil(cache.put(cacheKey, res.clone()));
+        } catch {}
+      }
+    }
+    return res;
+  }
+
   const route = resolveUpstream(cleanPath, query);
   if (!route) {
-    return errorResponse(404, 'Route not found. Required: /[subdomain.]identifier/{path}-{origExt}.{targetExt}');
+    return sendResponse(
+      errorResponse(404, 'Route not found. Required: /[subdomain.]identifier/{path}-{origExt}.{targetExt}')
+    );
   }
 
   // Check programmatic Cloudflare Edge Cache API
@@ -72,31 +86,26 @@ app.all('*', async (c) => {
     source = await fetchSource(originUrl);
   } catch (err: unknown) {
     const e = err as Error & { status?: number };
-    return errorResponse(e.status || 502, e.status ? e.message : `Upstream error: ${e.message}`);
+    const status = e.status || 502;
+    const msg = e.status === 404 ? 'Upstream image not found' : `Upstream error: ${e.message}`;
+    return sendResponse(errorResponse(status, msg));
   }
 
-  if (!source.svg && !source.raster) return errorResponse(404, 'Upstream asset empty');
+  if (!source.svg && !source.raster) {
+    return sendResponse(errorResponse(404, 'Upstream asset empty'));
+  }
 
   const opts = getOptions(query, cleanPath);
   const transformed = needsTransform(query, opts);
   const sameExt = origExt === requestedExt;
-  const webpSource = source.type.includes('webp');
+  const webpSource = source.type.includes('webp') || origExt === 'webp';
   const ifNoneMatch = c.req.header('If-None-Match');
-
-  function sendImage(res: Response): Response {
-    if (cache && c.executionCtx) {
-      try {
-        c.executionCtx.waitUntil(cache.put(cacheKey, res.clone()));
-      } catch {}
-    }
-    return res;
-  }
 
   if (!transformed && source.svg && requestedExt === 'svg') {
     const body = new TextEncoder().encode(source.svg);
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);
-    return sendImage(
+    return sendResponse(
       imageResponse(body, {
         type: MIME.svg,
         filename: `${basename(withoutExt)}.svg`,
@@ -111,7 +120,7 @@ app.all('*', async (c) => {
     const body = source.raster;
     const etag = await computeEtag(body);
     if (ifNoneMatch === etag) return notModifiedResponse(etag);
-    return sendImage(
+    return sendResponse(
       imageResponse(body, {
         type: MIME[requestedExt] || source.type || 'application/octet-stream',
         filename: `${basename(withoutExt)}.${requestedExt}`,
@@ -132,7 +141,7 @@ app.all('*', async (c) => {
       extraHeaders['X-Format-Fallback'] = `${requestedExt}→${result.actualExt}`;
     }
 
-    return sendImage(
+    return sendResponse(
       imageResponse(result.buffer, {
         type: result.type,
         filename: `${basename(withoutExt) || 'asset'}.${result.actualExt}`,
