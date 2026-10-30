@@ -1,0 +1,109 @@
+import { Hono } from 'hono';
+import { resolveUpstream, normalizeExt, getOptions, needsTransform, basename } from './routing';
+import { fetchSource, transform } from './processor';
+import { imageResponse, errorResponse, notModifiedResponse, computeEtag } from './response';
+import { MIME } from './constants';
+
+const app = new Hono();
+
+app.use('*', async (c, next) => {
+  c.header('Access-Control-Allow-Origin', '*');
+  c.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  c.header('Access-Control-Allow-Headers', 'Content-Type, If-None-Match');
+  c.header('Access-Control-Expose-Headers', 'ETag, Cache-Control, X-Render-Engine, X-Origin-Host, X-Format-Fallback');
+  if (c.req.method === 'OPTIONS') return c.body(null, 200);
+  await next();
+});
+
+app.all('*', async (c) => {
+  const url = new URL(c.req.url);
+  const query = Object.fromEntries(url.searchParams.entries());
+  const cleanPath = url.pathname.replace(/^\/+|\/+$/g, '');
+
+  if (cleanPath === 'favicon.ico') return c.body(null, 204);
+  if (!cleanPath || cleanPath === 'api' || cleanPath === 'health') {
+    return c.json(
+      { status: 'ok', service: 'imagengine' },
+      200,
+      {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Cache-Control': 'public, max-age=3600',
+      }
+    );
+  }
+
+  const route = resolveUpstream(cleanPath, query);
+  if (!route) {
+    return errorResponse(404, 'Route not found. Required: /[subdomain.]identifier/{path}-{origExt}.{targetExt}');
+  }
+
+  const { originUrl, originHost, withoutExt, origExt, requestedExt: routeExt } = route;
+  const requestedExt = normalizeExt(query.format || routeExt || 'webp');
+
+  let source;
+  try {
+    source = await fetchSource(originUrl);
+  } catch (err: unknown) {
+    const e = err as Error & { status?: number };
+    return errorResponse(e.status || 502, e.status ? e.message : `Upstream error: ${e.message}`);
+  }
+
+  if (!source.svg && !source.raster) return errorResponse(404, 'Upstream asset empty');
+
+  const opts = getOptions(query, cleanPath);
+  const transformed = needsTransform(query, opts);
+  const sameExt = origExt === requestedExt;
+  const webpSource = source.type.includes('webp');
+  const ifNoneMatch = c.req.header('If-None-Match');
+
+  if (!transformed && source.svg && requestedExt === 'svg') {
+    const body = new TextEncoder().encode(source.svg);
+    const etag = await computeEtag(body);
+    if (ifNoneMatch === etag) return notModifiedResponse(etag);
+    return imageResponse(body, {
+      type: MIME.svg,
+      filename: `${basename(withoutExt)}.svg`,
+      host: originHost,
+      engine: 'edge-passthrough',
+      etag,
+    });
+  }
+
+  if (!transformed && source.raster && (sameExt || (requestedExt === 'webp' && webpSource))) {
+    const body = source.raster;
+    const etag = await computeEtag(body);
+    if (ifNoneMatch === etag) return notModifiedResponse(etag);
+    return imageResponse(body, {
+      type: MIME[requestedExt] || source.type || 'application/octet-stream',
+      filename: `${basename(withoutExt)}.${requestedExt}`,
+      host: originHost,
+      engine: 'edge-passthrough',
+      etag,
+    });
+  }
+
+  try {
+    const result = await transform(source, query, opts, requestedExt);
+    const etag = await computeEtag(result.buffer);
+    if (ifNoneMatch === etag) return notModifiedResponse(etag);
+
+    const extraHeaders: Record<string, string> = {};
+    if (result.actualExt !== requestedExt) {
+      extraHeaders['X-Format-Fallback'] = `${requestedExt}→${result.actualExt}`;
+    }
+
+    return imageResponse(result.buffer, {
+      type: result.type,
+      filename: `${basename(withoutExt) || 'asset'}.${result.actualExt}`,
+      host: originHost,
+      engine: result.engine,
+      etag,
+      extraHeaders,
+    });
+  } catch (err: unknown) {
+    const e = err as Error & { status?: number };
+    return errorResponse(e.status || 500, e.message || 'Processing failed');
+  }
+});
+
+export default app;
