@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-  <title>Playground - ImagEngine</title>
+  <title>Try Yourself - ImagEngine</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #090d16;
-      --card: #0f172a;
-      --card-inner: #070c17;
-      --border: #1e293b;
-      --border-focus: #38bdf8;
-      --text: #f8fafc;
-      --muted: #94a3b8;
+      --bg: #0b0f19;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
       --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.12);
-      --green: #34d399;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      --accent-green: #34d399;
+      --code-bg: #030712;
+      --code-border: #1e293b;
     }
     *, *::before, *::after {
       box-sizing: border-box;
@@ -30,70 +30,126 @@
       width: 100%;
       max-width: 100%;
       overflow-x: hidden;
+      position: relative;
       background: var(--bg);
-      color: var(--text);
-      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-      line-height: 1.5;
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
     nav {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      max-width: 920px;
+      max-width: 1100px;
+      width: 100%;
       margin: 0 auto;
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      flex-wrap: wrap;
+      gap: 12px;
     }
     .logo {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #fff;
       text-decoration: none;
       letter-spacing: -0.02em;
     }
-    .logo span { color: var(--accent); }
+    .logo span {
+      color: var(--accent);
+    }
     .nav-links {
       display: flex;
-      gap: 18px;
+      align-items: center;
+      gap: 12px;
       list-style: none;
+      flex-wrap: wrap;
     }
     .nav-links a {
-      color: var(--muted);
+      color: var(--text-muted);
       text-decoration: none;
-      font-size: 0.84rem;
+      font-size: 0.88rem;
       font-weight: 500;
-      transition: color 0.15s;
+      transition: color 0.2s;
+      padding: 4px 6px;
     }
-    .nav-links a:hover, .nav-links a.active { color: #fff; }
-    .nav-btn { color: var(--accent) !important; font-weight: 600 !important; }
-
-    main {
-      max-width: 920px;
+    .nav-links a:hover, .nav-links a.active {
+      color: #fff;
+    }
+    .nav-btn {
+      background: #0284c7;
+      color: #fff !important;
+      padding: 6px 14px !important;
+      border-radius: 6px;
+      font-weight: 600 !important;
+      transition: background 0.2s;
+    }
+    .nav-btn:hover {
+      background: #0369a1;
+    }
+    header {
+      background: linear-gradient(180deg, rgba(56,189,248,0.06) 0%, rgba(11,15,25,0) 100%);
+      padding: 40px 16px 24px;
+      text-align: center;
+      width: 100%;
+      max-width: 100%;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(52, 211, 153, 0.1);
+      color: var(--accent-green);
+      border: 1px solid rgba(52, 211, 153, 0.25);
+      margin-bottom: 14px;
+    }
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-green);
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 12px;
+      color: #fff;
+      word-break: break-word;
+    }
+    .tagline {
+      font-size: 1.02rem;
+      color: var(--text-muted);
+      max-width: 720px;
       margin: 0 auto;
-      padding: 20px 16px 48px;
+      padding: 0 8px;
+      line-height: 1.6;
+    }
+    @media (max-width: 600px) {
+      header { padding: 28px 12px 18px; }
+      h1 { font-size: 1.7rem; }
+      .tagline { font-size: 0.92rem; }
+    }
+
+    /* Page Container (Identical to index.html) */
+    .container {
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 12px 16px 50px;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
 
-    /* Instruction / Intro Paragraph */
-    .intro-banner {
-      background: rgba(56, 189, 248, 0.04);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.83rem;
-      color: #cbd5e1;
-      line-height: 1.6;
-    }
-    .intro-banner strong {
-      color: #fff;
-    }
-
     /* Stage */
     .stage {
-      background: #030712;
+      background: var(--code-bg);
       background-image: 
         linear-gradient(45deg, #0b0f19 25%, transparent 25%), 
         linear-gradient(-45deg, #0b0f19 25%, transparent 25%), 
@@ -101,9 +157,9 @@
         linear-gradient(-45deg, transparent 75%, #0b0f19 75%);
       background-size: 20px 20px;
       background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-      border: 1px solid var(--border);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
-      height: 280px;
+      height: 300px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -119,7 +175,7 @@
       max-height: 100%;
       border-radius: 6px;
       object-fit: contain;
-      box-shadow: 0 6px 24px rgba(0,0,0,0.6);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.6);
       transition: opacity 0.15s;
     }
     .preview-img.loading { opacity: 0.35; }
@@ -138,29 +194,29 @@
 
     /* URL Command Bar */
     .url-bar-container {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 8px 10px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
     }
     .url-bar-label {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--muted);
+      color: var(--text-muted);
     }
     .url-bar {
       display: flex;
       align-items: center;
-      background: #030712;
-      border: 1px solid var(--border);
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
       border-radius: 6px;
       padding: 2px 4px 2px 10px;
       gap: 8px;
@@ -171,7 +227,7 @@
       border: none;
       color: #7dd3fc;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       outline: none;
       padding: 7px 0;
     }
@@ -183,9 +239,9 @@
       background: rgba(56, 189, 248, 0.15);
       border: 1px solid rgba(56, 189, 248, 0.3);
       color: var(--accent);
-      padding: 5px 12px;
+      padding: 6px 14px;
       border-radius: 5px;
-      font-size: 0.74rem;
+      font-size: 0.76rem;
       font-weight: 600;
       cursor: pointer;
       white-space: nowrap;
@@ -200,39 +256,39 @@
     .params-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 14px;
     }
 
     .param-card {
-      background: var(--card);
-      border: 1px solid var(--border);
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 12px;
     }
     .param-card-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding-bottom: 8px;
+      padding-bottom: 10px;
     }
     .param-card-title {
-      font-size: 0.74rem;
+      font-size: 0.78rem;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: #e2e8f0;
+      color: var(--text-main);
     }
     .preset-dropdown {
-      background: var(--card-inner);
+      background: var(--code-bg);
       color: var(--accent);
-      border: 1px solid var(--border);
+      border: 1px solid var(--code-border);
       border-radius: 5px;
-      padding: 4px 8px;
-      font-size: 0.74rem;
+      padding: 5px 10px;
+      font-size: 0.76rem;
       font-family: inherit;
       outline: none;
       cursor: pointer;
@@ -264,27 +320,27 @@
       gap: 4px;
     }
     .field label {
-      font-size: 0.68rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.04em;
-      color: var(--muted);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: space-between;
     }
     .field label span {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       color: #64748b;
     }
     .field input, .field select {
-      background: var(--card-inner);
-      color: #f8fafc;
-      border: 1px solid var(--border);
+      background: var(--code-bg);
+      color: var(--text-main);
+      border: 1px solid var(--code-border);
       border-radius: 5px;
       padding: 6px 8px;
-      font-size: 0.8rem;
+      font-size: 0.82rem;
       font-family: inherit;
       outline: none;
       width: 100%;
@@ -297,7 +353,7 @@
       margin: 0;
     }
     .field input:focus, .field select:focus {
-      border-color: var(--border-focus);
+      border-color: var(--accent);
     }
 
     /* Toggles Grid */
@@ -305,21 +361,22 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 14px 18px;
+      gap: 16px 20px;
       padding: 4px 0;
     }
     .toggle-label {
       display: inline-flex;
       align-items: center;
-      gap: 7px;
-      font-size: 0.78rem;
-      color: #cbd5e1;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
       cursor: pointer;
       user-select: none;
+      transition: color 0.15s;
     }
     .toggle-label input[type="checkbox"] {
-      width: 15px;
-      height: 15px;
+      width: 16px;
+      height: 16px;
       accent-color: var(--accent);
       cursor: pointer;
     }
@@ -327,53 +384,63 @@
       color: #fff;
     }
 
-    /* Cheatsheet Footer */
+    /* Cheatsheet Footer Box */
     .cheatsheet-box {
-      background: rgba(255, 255, 255, 0.02);
-      border: 1px solid var(--border);
+      background: var(--code-bg);
+      border: 1px solid var(--code-border);
       border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 0.78rem;
-      color: var(--muted);
-      line-height: 1.6;
+      padding: 14px 18px;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.7;
     }
     .cheatsheet-box code {
       font-family: 'JetBrains Mono', monospace;
       color: #7dd3fc;
       background: rgba(56, 189, 248, 0.08);
-      padding: 1px 4px;
-      border-radius: 3px;
+      padding: 2px 5px;
+      border-radius: 4px;
     }
 
+    /* Footer (Identical to index.html) */
     footer {
       text-align: center;
-      padding: 24px 16px;
-      border-top: 1px solid var(--border);
+      padding: 30px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
       color: #64748b;
-      font-size: 0.8rem;
-      margin-top: 12px;
+      font-size: 0.85rem;
     }
-    footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+    footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
 
+  <!-- Navigation (Identical structure to index.html) -->
   <nav>
     <a href="/" class="logo">Imag<span>Engine</span></a>
     <ul class="nav-links">
       <li><a href="/">Home</a></li>
-      <li><a href="/try-yourself.html" class="active">Playground</a></li>
+      <li><a href="/try-yourself.html" class="active">Try Yourself</a></li>
       <li><a href="https://topnepali.com" target="_blank" rel="noopener">Blog</a></li>
       <li><a href="https://topnepali.com/contact" target="_blank" rel="noopener" class="nav-btn">Contact</a></li>
     </ul>
   </nav>
 
-  <main>
+  <!-- Hero Header (Matching index.html style) -->
+  <header>
+    <div class="badge"><span class="badge-dot"></span> Edge Media Engine</div>
+    <h1>Transformation Playground</h1>
+    <p class="tagline">Test and verify all image transformation parameters supported by the edge engine. Enter custom values directly into the fields below, toggle filters, or edit the generated URL bar with real-time WebAssembly execution.</p>
+  </header>
 
-    <!-- Top Instruction Paragraph -->
-    <div class="intro-banner">
-      <strong>ImagEngine Interactive Playground:</strong> Test and verify all image transformation parameters supported by the edge engine. Enter custom values directly into the input fields below, toggle filters, or edit the generated URL bar. You can freely combine dimensions, pre-crop windows, fitting modes, format conversions, lossless rotations, Gaussian blur, and pixel effects. Every transformation is computed via WebAssembly at Cloudflare Edge and cached on repeat requests.
-    </div>
+  <!-- Container (Identical 1040px max-width to index.html) -->
+  <div class="container">
 
     <!-- Stage (Preview Display) -->
     <div class="stage">
@@ -385,7 +452,7 @@
     <div class="url-bar-container">
       <div class="url-bar-label">
         <span>Generated Edge URL (Live Bi-directional Sync)</span>
-        <span id="loadStatus" style="color: var(--green);">Ready</span>
+        <span id="loadStatus" style="color: var(--accent-green);">Ready</span>
       </div>
       <div class="url-bar">
         <input type="text" id="urlInput" spellcheck="false" onkeydown="if(event.key==='Enter') onManualUrl()" onblur="onManualUrl()">
@@ -500,7 +567,7 @@
 
           <div class="field">
             <label>Pipeline Order <span>info</span></label>
-            <input type="text" readonly disabled value="Crop &rarr; Resize &rarr; Blur &rarr; Encode" style="color: #64748b; font-size: 0.72rem;">
+            <input type="text" readonly disabled value="Crop &rarr; Resize &rarr; Blur &rarr; Encode" style="color: var(--text-muted); font-size: 0.74rem;">
           </div>
         </div>
       </div>
@@ -543,7 +610,7 @@
 
     <!-- Parameter Cheatsheet -->
     <div class="cheatsheet-box">
-      <strong>Parameter Syntax Cheatsheet:</strong><br>
+      <strong style="color: #fff;">Parameter Syntax Cheatsheet:</strong><br>
       &bull; <code>w</code> / <code>h</code>: Target width &amp; height in pixels (e.g. <code>w=800&amp;h=450</code>)<br>
       &bull; <code>fit</code>: <code>cover</code> (crops to aspect ratio), <code>contain</code> (letterboxes), <code>fill</code> (stretches), <code>inside</code> (shrinks within bounds)<br>
       &bull; <code>position</code>: Crop gravity: <code>center</code>, <code>top</code>, <code>bottom</code>, <code>left</code>, <code>right</code><br>
@@ -555,10 +622,16 @@
       &bull; <code>grayscale=1</code> &amp; <code>sharpen=1</code>: Black-and-white conversion &amp; unsharp edge sharpening
     </div>
 
-  </main>
+  </div>
 
+  <!-- Footer (Identical to index.html) -->
   <footer>
-    ImagEngine &bull; Real-Time Edge Image Processing &bull; Developed by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a>
+    <p>ImagEngine &bull; Real-Time Image Optimization &amp; Delivery Platform</p>
+    <p style="margin-top: 6px;">
+      Developed by <a href="https://grisma.info.np" target="_blank" rel="noopener">Grisma</a> &bull; 
+      <a href="https://topnepali.com" target="_blank" rel="noopener">TopNepali</a> &bull; 
+      <a href="https://topnepali.com/contact" target="_blank" rel="noopener">Contact / Request Whitelist</a>
+    </p>
   </footer>
 
   <script>
@@ -737,7 +810,7 @@
       document.getElementById('loadingSpinner').style.display = 'none';
       document.getElementById('previewImg').classList.remove('loading');
       document.getElementById('loadStatus').innerText = 'Loaded (Edge 200 OK)';
-      document.getElementById('loadStatus').style.color = 'var(--green)';
+      document.getElementById('loadStatus').style.color = 'var(--accent-green)';
     }
 
     function onError() {
@@ -762,7 +835,6 @@
 
     // Initialize with prefilled sample values
     window.addEventListener('DOMContentLoaded', () => {
-      // Set initial values into controls
       document.getElementById('inpW').value = DEFAULT_CONFIG.w;
       document.getElementById('inpH').value = DEFAULT_CONFIG.h;
       document.getElementById('selFit').value = DEFAULT_CONFIG.fit;
